@@ -12,8 +12,8 @@ import HeroShowreel from "@/components/HeroShowreel";
 import { Button } from "@/components/ui/button";
 import { amenitiesList, diningVenues } from "@/data/content";
 import { siteConfig } from "@/lib/site";
-import { iconMap } from "@/lib/icons";
 import { cn, asset } from "@/lib/utils";
+import AmenitiesMarquee from "@/components/AmenitiesMarquee";
 
 function BookingBar() {
   const navigate = useNavigate();
@@ -236,31 +236,16 @@ export default function Home() {
       </section>
 
       {/* AMENITIES */}
-      <section className="container-site py-14 md:py-20">
-        <SectionHeading
-          align="center"
-          eyebrow="Amenities"
-          title="Everything you need, all under one roof"
-          description="From a cooling pool to a business centre, every detail is designed around a comfortable stay and a productive event."
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          {amenitiesList.map((a, i) => {
-            const Icon = iconMap[a.icon];
-            return (
-              <Reveal
-                key={a.name}
-                delay={(i % 4) * 0.06}
-                className="border-t border-forest-950/10 p-7 transition-colors hover:bg-white"
-              >
-                <div className="group flex h-full flex-col">
-                  <Icon className="h-6 w-6 text-primary transition-colors group-hover:text-brass-500" />
-                  <h3 className="mt-5 font-display text-lg font-medium text-forest-950">{a.name}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{a.description}</p>
-                </div>
-              </Reveal>
-            );
-          })}
+      <section className="py-14 md:py-20">
+        <div className="container-site">
+          <SectionHeading
+            align="center"
+            eyebrow="Amenities"
+            title="Everything you need, all under one roof"
+            description="From a cooling pool to a business centre, every detail is designed around a comfortable stay and a productive event."
+          />
         </div>
+        <AmenitiesMarquee />
       </section>
 
       {/* ABOUT */}
