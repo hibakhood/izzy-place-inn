@@ -49,7 +49,7 @@ export default function Header() {
           <Logo light={transparent} />
         </Link>
 
-        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 lg:flex" aria-label="Main">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-4 lg:flex" aria-label="Main">
           {navLinks.map((link) =>
             link.children ? (
               <div key={link.href} className="group relative">
