@@ -127,7 +127,7 @@ export const diningVenues: DiningVenue[] = [
       "A full-service restaurant serving a la carte Nigerian, Indian, Chinese, Lebanese, European and American cuisine — from smoky jollof to an international menu prepared to order.",
     cuisine: "International à la carte",
     hours: "6:30am – 10:30pm",
-    image: asset("/images/facilities/restaurant-2.jpg"),
+    image: asset("/images/facilities/bisi-restaurant.jpg"),
   },
   {
     name: "Funke Pool Bar",
