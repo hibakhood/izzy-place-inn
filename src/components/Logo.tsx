@@ -11,12 +11,12 @@ export default function Logo({ className, light = false }: LogoProps) {
       <img
         src={asset("/logo.png")}
         alt="Kakanfo Inn & Conference Centre logo"
-        className="h-10 w-10 object-contain"
+        className="h-12 w-12 object-contain"
       />
       <span className="flex flex-col leading-none">
         <span
           className={cn(
-            "font-aptos text-lg font-semibold uppercase tracking-tight",
+            "font-aptos text-xl font-semibold uppercase tracking-tight",
             light ? "text-cream-100" : "text-forest-900"
           )}
         >
@@ -24,7 +24,7 @@ export default function Logo({ className, light = false }: LogoProps) {
         </span>
         <span
           className={cn(
-            "mt-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.24em]",
+            "mt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.24em]",
             light ? "text-brass-300" : "text-brass-600"
           )}
         >

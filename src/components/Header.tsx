@@ -23,7 +23,7 @@ export default function Header() {
 
   const navClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "group/nav relative px-1 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] transition-colors duration-300",
+      "group/nav relative px-1 py-2 text-[0.8rem] font-semibold uppercase tracking-[0.18em] transition-colors duration-300",
       "after:absolute after:bottom-0 after:left-1/2 after:h-[1.5px] after:-translate-x-1/2 after:bg-brass-400 after:transition-all after:duration-500 after:ease-[cubic-bezier(0.22,1,0.36,1)]",
       isActive ? "after:w-full" : "after:w-0 group-hover/nav:after:w-full",
       transparent
@@ -89,7 +89,7 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <Button
             asChild
-            className="hidden rounded-full px-7 text-[0.7rem] font-semibold uppercase tracking-[0.18em] sm:inline-flex"
+            className="hidden rounded-full px-7 text-[0.8rem] font-semibold uppercase tracking-[0.18em] sm:inline-flex"
           >
             <Link to="/booking">Book Now</Link>
           </Button>
@@ -119,7 +119,7 @@ export default function Header() {
                         to={link.href}
                         className={({ isActive }) =>
                           cn(
-                            "block px-2 py-3 text-[0.78rem] font-semibold uppercase tracking-[0.18em] transition-colors",
+                            "block px-2 py-3 text-[0.85rem] font-semibold uppercase tracking-[0.18em] transition-colors",
                             isActive ? "text-brass-600" : "text-forest-800"
                           )
                         }
@@ -151,7 +151,7 @@ export default function Header() {
                       to={link.href}
                       className={({ isActive }) =>
                         cn(
-                          "block px-2 py-4 text-[0.78rem] font-semibold uppercase tracking-[0.18em] transition-colors",
+                          "block px-2 py-4 text-[0.85rem] font-semibold uppercase tracking-[0.18em] transition-colors",
                           isActive ? "text-brass-600" : "text-forest-800"
                         )
                       }
@@ -164,7 +164,7 @@ export default function Header() {
               <div className="border-t border-forest-950/5 pt-5">
                 <Button
                   asChild
-                  className="w-full rounded-full text-[0.75rem] font-semibold uppercase tracking-[0.18em]"
+                  className="w-full rounded-full text-[0.8rem] font-semibold uppercase tracking-[0.18em]"
                 >
                   <Link to="/booking">Book Now</Link>
                 </Button>
