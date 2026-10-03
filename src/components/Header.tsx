@@ -44,12 +44,12 @@ export default function Header() {
           : "border-b border-forest-950/5 bg-white/90 shadow-[0_12px_40px_-24px_rgba(5,28,16,0.4)] backdrop-blur-xl"
       )}
     >
-      <div className="container-site flex h-[4.25rem] items-center justify-between md:h-20">
+      <div className="container-site relative flex h-[4.25rem] items-center justify-between md:h-20">
         <Link to="/" aria-label="Kakanfo Inn home">
           <Logo light={transparent} />
         </Link>
 
-        <nav className="hidden items-center gap-10 lg:flex" aria-label="Main">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 lg:flex" aria-label="Main">
           {navLinks.map((link) =>
             link.children ? (
               <div key={link.href} className="group relative">
