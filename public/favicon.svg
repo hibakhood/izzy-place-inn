@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Izzy Place Inn and Suites">
+  <rect width="64" height="64" rx="10" fill="#051C10"/>
+  <rect x="4" y="4" width="56" height="56" rx="7" fill="none" stroke="#B98A3F" stroke-width="1.5"/>
+  <text x="32" y="42" font-family="Fraunces, Georgia, 'Times New Roman', serif" font-size="28" font-weight="600" fill="#D6B876" text-anchor="middle">IP</text>
+</svg>

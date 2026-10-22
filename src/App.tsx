@@ -3,14 +3,10 @@ import Layout from "@/components/Layout";
 import Home from "@/pages/Home";
 import Rooms from "@/pages/Rooms";
 import RoomDetail from "@/pages/RoomDetail";
-import Events from "@/pages/Events";
-import EventDetail from "@/pages/EventDetail";
 import Booking from "@/pages/Booking";
 import Gallery from "@/pages/Gallery";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
-import Blog from "@/pages/Blog";
-import BlogDetail from "@/pages/BlogDetail";
 import NotFound from "@/pages/NotFound";
 
 export default function App() {
@@ -20,14 +16,10 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/rooms/:slug" element={<RoomDetail />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/events/:slug" element={<EventDetail />} />
         <Route path="/booking" element={<Booking />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

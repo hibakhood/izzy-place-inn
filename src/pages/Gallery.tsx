@@ -10,7 +10,6 @@ const FILTERS = [
   { id: "all", label: "All" },
   { id: "rooms", label: "Rooms & Suites" },
   { id: "facilities", label: "Facilities" },
-  { id: "events", label: "Events & Conference" },
 ] as const;
 
 export default function Gallery() {
@@ -21,16 +20,16 @@ export default function Gallery() {
     <>
       <Seo
         title="Gallery"
-        description="Take a visual tour of Kakanfo Inn & Conference Centre — our rooms, suites, conference venues, dining rooms and leisure facilities."
-        keywords="Kakanfo Inn gallery, Ibadan hotel photos, conference centre pictures, hotel rooms Ibadan"
+        description="See photos of the rooms, suites, kitchens, lobby and exterior at Izzy Place Inn & Suites."
+        keywords="Izzy Place Inn gallery, Ibadan hotel photos, hotel rooms Ibadan, suites pictures Ibadan"
         path="/gallery"
       />
 
       <PageHero
         eyebrow="Gallery"
-        title="A look inside Kakanfo Inn"
-        description="Rooms that rest, venues that impress, and grounds that hold a party well. Wander through a few of our favourite corners."
-        image={asset("/images/halls/lekan-are-hall-1.jpg")}
+        title="A look inside Izzy Place"
+        description="Explore our rooms, fitted kitchens, welcoming lobby and the house itself."
+        image={asset("/images/facilities/lobby-3.jpg")}
       />
 
       <section className="container-site py-12 md:py-16">
@@ -43,8 +42,8 @@ export default function Gallery() {
               className={cn(
                 "rounded-sm border px-5 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition-colors",
                 filter === f.id
-                  ? "border-forest-950 bg-forest-950 text-cream-100"
-                  : "border-forest-950/15 bg-transparent text-forest-800 hover:border-forest-950/40"
+                  ? "border-forest-950 bg-forest-950 text-ivory-soft"
+                  : "border-line bg-transparent text-ink hover:border-line"
               )}
             >
               {f.label}
@@ -59,7 +58,7 @@ export default function Gallery() {
 
       <CallToAction
         title="See it in person"
-        subtitle="Photographs are nice — a walk through the grounds is better. Our reception is open 24 hours for tours."
+        subtitle="Contact reception if you would like to visit and see the rooms."
       />
     </>
   );

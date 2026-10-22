@@ -1,5 +1,5 @@
 -- ============================================================================
--- Kakanfo Inn & Conference Centre — Supabase schema
+-- Izzy Place Inn & Suites — Supabase schema
 -- Run this in the Supabase SQL editor (or via `supabase db push`).
 -- ============================================================================
 
@@ -19,41 +19,27 @@ create table if not exists public.room_categories (
   created_at    timestamptz not null default now()
 );
 
--- Event spaces ----------------------------------------------------------------
-create table if not exists public.event_spaces (
-  id            text primary key,
-  name          text not null,
-  slug          text not null unique,
-  description   text not null,
-  capacity      int not null default 0,
-  size_sqm      numeric not null default 0,
-  price_per_day numeric not null check (price_per_day >= 0),
-  setup_styles  text[] not null default '{}',
-  amenities     text[] not null default '{}',
-  images        text[] not null default '{}',
-  featured      boolean not null default false,
-  created_at    timestamptz not null default now()
-);
-
 -- Add-on services -------------------------------------------------------------
 create table if not exists public.add_on_services (
   id          text primary key,
   name        text not null,
   description text not null,
-  price       numeric not null check (price >= 0),
+  price       numeric check (price >= 0),
   category    text not null default 'other'
     check (category in ('transport', 'dining', 'amenities', 'wellness', 'other')),
   icon        text not null default 'Sparkles',
   available   boolean not null default true
 );
 
+-- Rates are quoted by management rather than charged at booking.
+alter table public.add_on_services alter column price drop not null;
+
 -- Bookings --------------------------------------------------------------------
 create table if not exists public.bookings (
   id               uuid primary key default gen_random_uuid(),
   booking_reference text not null unique,
-  booking_type     text not null check (booking_type in ('room', 'event')),
+  booking_type     text not null default 'room' check (booking_type = 'room'),
   room_category_id text references public.room_categories (id) on delete set null,
-  event_space_id   text references public.event_spaces (id) on delete set null,
   guest_name       text not null,
   guest_email      text not null,
   guest_phone      text not null,
@@ -69,14 +55,13 @@ create table if not exists public.bookings (
   booking_status   text not null default 'confirmed'
     check (booking_status in ('pending', 'confirmed', 'checked_in', 'completed', 'cancelled', 'no_show')),
   created_at       timestamptz not null default now(),
-  check (booking_type = 'room'  or room_category_id is not null),
-  check (booking_type = 'event' or event_space_id  is not null)
+  check (room_category_id is not null)
 );
 
--- Availability (optional: mark booked / blocked nights per room or space) -------
+-- Availability (optional: mark booked / blocked nights per room) ----------------
 create table if not exists public.availability (
   id          uuid primary key default gen_random_uuid(),
-  resource_type text not null check (resource_type in ('room', 'event')),
+  resource_type text not null default 'room' check (resource_type = 'room'),
   resource_id text not null,
   blocked_date date not null,
   reason      text,
@@ -91,7 +76,6 @@ create index if not exists idx_bookings_dates on public.bookings (check_in_date,
 
 -- Row Level Security ------------------------------------------------------------
 alter table public.room_categories enable row level security;
-alter table public.event_spaces enable row level security;
 alter table public.add_on_services enable row level security;
 alter table public.bookings enable row level security;
 alter table public.availability enable row level security;
@@ -99,9 +83,6 @@ alter table public.availability enable row level security;
 -- Public catalog is readable by everyone (the website reads it).
 create policy "Catalog is public read"
   on public.room_categories for select using (true);
-
-create policy "Catalog is public read"
-  on public.event_spaces for select using (true);
 
 create policy "Catalog is public read"
   on public.add_on_services for select using (true);

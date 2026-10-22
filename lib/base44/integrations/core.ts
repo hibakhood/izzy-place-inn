@@ -20,8 +20,8 @@ export const Core = {
     to,
     subject,
     html,
-    from_name = "Kakanfo Inn and Conference Centre",
-    from_email = "bookings@kakanfoinn.com",
+    from_name = "Izzy Place Inn & Suites",
+    from_email = "bookings@izzyplaceinn.com",
   }: SendEmailArgs): Promise<{ id: string }> => {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {

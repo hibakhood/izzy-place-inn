@@ -6,11 +6,11 @@ import Seo from "@/components/Seo";
 import JsonLd from "@/components/JsonLd";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
-import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import CallToAction from "@/components/CallToAction";
 import HeroShowreel from "@/components/HeroShowreel";
+import HomeRoomsCarousel from "@/components/HomeRoomsCarousel";
 import { Button } from "@/components/ui/button";
-import { amenitiesList, diningVenues } from "@/data/content";
+import { amenitiesList } from "@/data/content";
 import { siteConfig } from "@/lib/site";
 import { cn, asset } from "@/lib/utils";
 import AmenitiesMarquee from "@/components/AmenitiesMarquee";
@@ -37,10 +37,10 @@ function BookingBar() {
       initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.9, delay: 1, ease: [0.22, 1, 0.36, 1] }}
-      className="mx-auto mt-14 grid max-w-4xl grid-cols-1 overflow-hidden rounded-md border border-white/25 bg-white/95 shadow-lift backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-[1fr_1fr_0.8fr_auto]"
+      className="mx-auto mt-14 grid max-w-4xl grid-cols-1 overflow-hidden rounded-md border border-white/25 bg-ivory/95 shadow-lift backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-[1fr_1fr_0.8fr_auto]"
     >
-      <label className="group flex flex-col gap-1 border-b border-forest-950/10 px-6 py-5 sm:border-b-0 sm:border-r">
-        <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-brass-600">
+      <label className="group flex flex-col gap-1 border-b border-line px-6 py-5 sm:border-b-0 sm:border-r">
+        <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-gold-deep">
           Check-in
         </span>
         <input
@@ -49,11 +49,11 @@ function BookingBar() {
           min={today}
           value={checkIn}
           onChange={(e) => setCheckIn(e.target.value)}
-          className="w-full bg-transparent text-sm font-semibold text-forest-950 outline-none [color-scheme:light]"
+          className="w-full bg-transparent text-sm font-semibold text-ink outline-none [color-scheme:light]"
         />
       </label>
-      <label className="flex flex-col gap-1 border-b border-forest-950/10 px-6 py-5 sm:border-b-0 sm:border-r">
-        <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-brass-600">
+      <label className="flex flex-col gap-1 border-b border-line px-6 py-5 sm:border-b-0 sm:border-r">
+        <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-gold-deep">
           Check-out
         </span>
         <input
@@ -62,17 +62,17 @@ function BookingBar() {
           min={checkIn || today}
           value={checkOut}
           onChange={(e) => setCheckOut(e.target.value)}
-          className="w-full bg-transparent text-sm font-semibold text-forest-950 outline-none [color-scheme:light]"
+          className="w-full bg-transparent text-sm font-semibold text-ink outline-none [color-scheme:light]"
         />
       </label>
-      <label className="flex flex-col gap-1 border-b border-forest-950/10 px-6 py-5 sm:border-b-0 sm:border-r">
-        <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-brass-600">
+      <label className="flex flex-col gap-1 border-b border-line px-6 py-5 sm:border-b-0 sm:border-r">
+        <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-gold-deep">
           Guests
         </span>
         <select
           value={guests}
           onChange={(e) => setGuests(Number(e.target.value))}
-          className="w-full cursor-pointer appearance-none bg-transparent text-sm font-semibold text-forest-950 outline-none"
+          className="w-full cursor-pointer appearance-none bg-transparent text-sm font-semibold text-ink outline-none"
         >
           {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
             <option key={n} value={n}>
@@ -82,7 +82,7 @@ function BookingBar() {
         </select>
       </label>
       <div className="flex sm:flex-col">
-        <Button type="submit" size="lg" className="flex-1 rounded-none bg-forest-950 text-cream-100 hover:bg-forest-800 sm:h-full sm:px-8">
+        <Button type="submit" size="lg" className="flex-1 rounded-none bg-charcoal text-ivory-soft hover:bg-forest sm:h-full sm:px-8">
           Check availability
           <ArrowRight className="h-4 w-4" />
         </Button>
@@ -95,9 +95,9 @@ export default function Home() {
   return (
     <>
       <Seo
-        title={`${siteConfig.shortName} & Conference Centre — ${siteConfig.tagline}`}
-        description="Book rooms and event spaces at Kakanfo Inn & Conference Centre, Ibadan. Ninety-five rooms and suites, a 2,000 guest conference hall, three dining venues and 24-hour service."
-        keywords="Kakanfo Inn, hotel Ibadan, conference centre Ibadan, book hotel Ibadan, event venue Ibadan, wedding venue Ibadan"
+        title={`${siteConfig.name}. ${siteConfig.tagline}`}
+        description="Book a room at Izzy Place Inn & Suites in Ibadan. Enjoy free Wi-Fi, air conditioning, helpful staff and reception open 24 hours a day."
+        keywords="Izzy Place Inn, Izzy Place Inn and Suites, hotel Ibadan, suites Ibadan, affordable hotel Ibadan, Old Ife Road hotel"
         path="/"
       />
       <JsonLd
@@ -113,6 +113,7 @@ export default function Home() {
             "@type": "PostalAddress",
             streetAddress: `${siteConfig.address.line1}, ${siteConfig.address.line2}`,
             addressLocality: siteConfig.address.city,
+            addressRegion: siteConfig.address.state,
             addressCountry: siteConfig.address.country,
           },
           amenityFeature: amenitiesList.map((a) => ({
@@ -122,8 +123,7 @@ export default function Home() {
           })),
           checkinTime: "14:00",
           checkoutTime: "12:00",
-          priceRange: "₦₦₦",
-          starRating: { "@type": "Rating", ratingValue: "4" },
+          priceRange: "₦₦",
         }}
       />
 
@@ -137,10 +137,9 @@ export default function Home() {
         >
           <HeroShowreel />
         </motion.div>
-        <div className="absolute inset-0 bg-forest-950/50" />
-        <div className="absolute inset-0 bg-gradient-to-b from-forest-950/50 via-transparent to-forest-950/80" />
+        <div className="hero-scrim absolute inset-0" />
 
-        <div className="container-site relative z-10 pb-40 pt-28 text-center">
+        <div className="hero-copy container-site relative z-10 pb-40 pt-28 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -148,7 +147,7 @@ export default function Home() {
             className="eyebrow-rule mx-auto justify-center"
           >
             <span className="text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-brass-300">
-              Ring Road · Ibadan · Nigeria
+              Old Ife Road · Ibadan · Nigeria
             </span>
           </motion.div>
 
@@ -156,11 +155,10 @@ export default function Home() {
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.4 }}
-            className="mx-auto mt-8 max-w-4xl font-display text-[2.75rem] font-light leading-[1.02] text-cream-100 sm:text-6xl md:text-7xl"
+            className="mx-auto mt-8 max-w-4xl font-display text-[2.75rem] font-light leading-[1.02] text-ivory-soft sm:text-6xl md:text-7xl"
           >
-            Where Ibadan{" "}
-            <em className="font-normal italic text-brass-300">welcomes</em>{" "}
-            the world
+            Your Comfort,{" "}
+            <em className="font-normal italic text-brass-300">Our Priority.</em>
           </motion.h1>
 
           <motion.p
@@ -169,8 +167,7 @@ export default function Home() {
             transition={{ duration: 0.9, delay: 0.6 }}
             className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-cream-200/85 sm:text-lg"
           >
-            Stylish rooms, a business class conference centre, and warm Yoruba
-            hospitality at the heart of the city.
+            Comfortable rooms, friendly staff and a secure place to stay in Ibadan.
           </motion.p>
 
           <motion.div
@@ -179,16 +176,16 @@ export default function Home() {
             transition={{ duration: 0.9, delay: 0.8 }}
             className="mx-auto mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
-            <Button asChild size="lg" className="bg-cream-100 text-forest-950 hover:bg-white">
+            <Button asChild size="lg" className="bg-cream-100 text-ink hover:bg-ivory">
               <Link to="/booking">Book your stay</Link>
             </Button>
             <Button
               asChild
               size="lg"
-              className="border border-cream-100/40 bg-transparent text-cream-100 hover:border-brass-300 hover:text-brass-200"
+              className="border border-cream-100/40 bg-transparent text-ivory-soft hover:border-brass-300 hover:text-brass-200"
             >
               <Link to="/rooms">
-                Explore rooms
+                Explore rooms &amp; suites
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
@@ -208,12 +205,12 @@ export default function Home() {
       </section>
 
       {/* STATS */}
-      <section className="border-y border-forest-950/10 bg-background">
+      <section className="border-y border-line bg-background">
         <div className="container-site grid grid-cols-2 md:grid-cols-4">
           {[
-            ["95", "Rooms, Suites & Villas"],
-            ["8", "Conference Halls & Venues"],
-            ["2,000", "Guests in the Lekan Are Hall"],
+            [String(siteConfig.rooms), "Rooms & Suites"],
+            ["4", "Room Categories"],
+            ["3", "Dining Venues"],
             ["24/7", "Reception & Security"],
           ].map(([value, label], i) => (
             <Reveal
@@ -221,12 +218,12 @@ export default function Home() {
               delay={i * 0.08}
               className={cn(
                 "px-6 py-10 text-center md:py-12",
-                i % 2 === 1 && "border-l border-forest-950/10",
-                i >= 2 && "border-t border-forest-950/10 md:border-t-0",
-                i >= 1 && "md:border-l md:border-forest-950/10"
+                i % 2 === 1 && "border-l border-line",
+                i >= 2 && "border-t border-line md:border-t-0",
+                i >= 1 && "md:border-l md:border-line"
               )}
             >
-              <p className="font-display text-4xl font-light text-forest-950 md:text-5xl">{value}</p>
+              <p className="font-display text-4xl font-light text-ink md:text-5xl">{value}</p>
               <p className="mt-2 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {label}
               </p>
@@ -241,112 +238,77 @@ export default function Home() {
           <SectionHeading
             align="center"
             eyebrow="Amenities"
-            title="Everything you need, all under one roof"
-            description="From a cooling pool to a business centre, every detail is designed around a comfortable stay and a productive event."
+            title="Amenities for a comfortable stay"
+            description="Enjoy free Wi-Fi, air conditioning and a kitchen or kitchenette during your stay."
           />
         </div>
         <AmenitiesMarquee />
       </section>
 
       {/* ABOUT */}
-      <section className="bg-forest-950 py-14 md:py-20">
-        <div className="container-site grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
+      <section aria-labelledby="about-house-title" className="overflow-hidden bg-ivory py-16 text-ink md:py-20 lg:py-24">
+        <div className="container-site grid items-center gap-12 lg:grid-cols-[1.08fr_1fr] lg:gap-20">
           <Reveal>
-            <div className="relative">
-              <img
-                src={asset("/images/facilities/lobby.jpg")}
-                alt="Kakanfo Inn lobby"
-                className="aspect-[4/5] w-full rounded-sm object-cover"
-              />
-              <div className="absolute -bottom-6 -right-4 hidden rounded-sm bg-brass-500 px-7 py-5 text-white shadow-lift sm:block lg:-right-8">
-                <p className="font-display text-2xl font-light">Est. Ibadan</p>
-                <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-brass-100">
-                  Hospitality with heritage
-                </p>
-              </div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-gold-deep">
+              Make yourself at home
+            </p>
+            <h2 id="about-house-title" className="mt-7 font-display text-[2.6rem] font-normal leading-[1.08] tracking-[-0.025em] sm:text-5xl xl:text-[4rem]">
+              A little more comfort.
+              <span className="mt-2 block italic text-gold-deep">A little closer to home.</span>
+            </h2>
+            <div className="mt-9 space-y-6 text-base leading-[1.8] text-muted-foreground md:text-lg">
+              <p>
+                Stay at Izzy Place Inn &amp; Suites, off Old Ife Road in Ibadan.
+                Our rooms have free Wi-Fi, air conditioning and a kitchen or
+                kitchenette to help you feel at home.
+              </p>
+              <p>
+                Whether you are in town for business or family, you will find quiet
+                rooms, helpful staff and a secure place to stay.
+              </p>
             </div>
+            <Link to="/about" className="mt-10 inline-flex min-h-11 items-center gap-3 border-b border-gold pb-1 text-sm font-semibold tracking-wide transition-colors hover:text-gold-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep md:mt-12 md:text-base">
+              Get to know Izzy Place
+              <ArrowRight className="h-4 w-4 -rotate-45" aria-hidden="true" />
+            </Link>
           </Reveal>
           <Reveal delay={0.15}>
-            <p className="eyebrow-rule text-brass-300">
-              <span className="text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-brass-300">
-                About the house
-              </span>
-            </p>
-            <h2 className="mt-6 font-display text-3xl font-light leading-[1.08] text-cream-100 sm:text-4xl md:text-[2.75rem]">
-              A name built on courage, carried with hospitality
-            </h2>
-            <p className="mt-7 leading-relaxed text-cream-200/75">
-              “Kakanfo” is the historic title of the generalissimo of the Yoruba army — a
-              warrior leader trusted to command when it mattered most. We carry that name with
-              the same sense of duty: guests and events under our care are treated like nothing
-              less than honoured guests of the house.
-            </p>
-            <p className="mt-5 leading-relaxed text-cream-200/75">
-              Since October 1988 we have grown from forty-two rooms to ninety-five beautifully
-              crafted modern rooms and suites, alongside world class conference halls — a
-              prestigious, ISO certified house of 5-star comfort on Ring Road, in the heart of
-              Ibadan.
-            </p>
-            <div className="mt-10 flex flex-wrap items-center gap-5">
-              <Button asChild className="bg-cream-100 text-forest-950 hover:bg-white">
-                <Link to="/about">Our story</Link>
-              </Button>
-              <Button asChild variant="ghost" className="text-brass-300 hover:bg-white/10 hover:text-brass-200">
-                <Link to="/events">
-                  Conference &amp; events
-                  <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
+            <div className="relative isolate px-3 pt-0 sm:px-5">
+              <div aria-hidden="true" className="absolute inset-x-0 bottom-0 top-5 -z-10 rounded-t-xl border border-line" />
+              <img
+                src={asset("/images/facilities/outdoor-image.jpg")}
+                alt="Exterior of Izzy Place Inn & Suites"
+                loading="lazy"
+                className="aspect-[4/5] w-full rounded-t-[50%_42%] object-cover lg:aspect-[4/5.3]"
+              />
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* DINING */}
-      <section className="container-site py-14 md:py-20">
-        <SectionHeading
-          eyebrow="Dining"
-          title="Three ways to eat well in Ibadan"
-          description="From full-service international dining at Bisi Restaurant to poolside bites and cocktail evenings in Bawa Continent Garden — plus takeaway, corporate lunch delivery and outdoor catering."
-        />
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-          {diningVenues.map((v, i) => (
-            <Reveal key={v.name} delay={i * 0.07}>
-              <article className="group">
-                <div className="relative overflow-hidden rounded-sm">
-                  <img
-                    src={v.image}
-                    alt={v.name}
-                    loading="lazy"
-                    className="aspect-[3/4] w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-forest-950/70 via-transparent to-transparent" />
-                  <h3 className="absolute bottom-4 left-5 right-5 font-display text-xl font-normal leading-snug text-cream-100">
-                    {v.name}
-                  </h3>
-                </div>
-                <div className="mt-5 border-t border-forest-950/10 pt-4">
-                  <div className="flex items-center justify-between text-[0.68rem] font-semibold uppercase tracking-[0.16em]">
-                    <span className="text-brass-600">{v.cuisine}</span>
-                    <span className="text-muted-foreground">{v.hours}</span>
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{v.description}</p>
-                </div>
-              </article>
-            </Reveal>
-          ))}
-        </div>
-      </section>
+      <HomeRoomsCarousel />
 
-      {/* TESTIMONIALS */}
-      <section className="border-y border-forest-950/10 bg-background py-14 md:py-20">
-        <div className="container-site">
-          <SectionHeading
-            align="center"
-            eyebrow="Guest Stories"
-            title="Guests and hosts keep coming back"
-          />
-          <TestimonialsCarousel />
+      {/* HOTEL PHOTOS */}
+      <section aria-labelledby="hotel-photos-title" className="bg-ivory py-14 md:py-20">
+        <h2 id="hotel-photos-title" className="sr-only">A look around Izzy Place</h2>
+        <div className="container-site grid grid-cols-2 items-start gap-4 md:grid-cols-4 md:gap-5 lg:gap-6">
+          {[
+            { src: "/images/facilities/outdoor-image.jpg", alt: "The outside of Izzy Place Inn & Suites" },
+            { src: "/images/rooms/classic-room-view-4.jpg", alt: "Classic Room with a bed and sitting area" },
+            { src: "/images/rooms/executive-suite-view-3.jpg", alt: "Executive Suite with a kitchen and space to relax" },
+            { src: "/images/rooms/family-living-room-2.jpg", alt: "Living room in the Family Room" },
+          ].map((photo, index) => (
+            <figure key={photo.src} className={cn(index % 2 === 1 && "mt-8 lg:mt-12")}>
+              <img
+                src={asset(photo.src)}
+                alt={photo.alt}
+                loading="lazy"
+                width={600}
+                height={800}
+                className="aspect-[3/4] w-full rounded-t-[50%_38%] object-cover"
+              />
+            </figure>
+          ))}
         </div>
       </section>
 

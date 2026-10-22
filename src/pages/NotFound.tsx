@@ -11,11 +11,11 @@ export default function NotFound() {
       <section className="flex min-h-[70vh] items-center justify-center bg-cream-100 px-4">
         <div className="text-center">
           <p className="font-display text-7xl font-semibold text-primary">404</p>
-          <h1 className="mt-4 font-display text-2xl font-semibold text-forest-900">
-            This page wandered off
+          <h1 className="mt-4 font-display text-2xl font-semibold text-ink">
+            Page not found
           </h1>
           <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-            The page you are looking for does not exist or has been moved. Let us get you back to the house.
+            The page you are looking for does not exist or has been moved. You can return to the home page or browse our rooms.
           </p>
           <div className="mt-8 flex justify-center gap-3">
             <Button asChild>

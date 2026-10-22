@@ -30,3 +30,6 @@ npm-debug.log*
 # Opencode skills
 .agents/
 skills-lock.json
+
+# TypeScript incremental build info
+*.tsbuildinfo

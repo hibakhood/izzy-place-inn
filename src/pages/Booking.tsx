@@ -4,7 +4,8 @@ import Seo from "@/components/Seo";
 import BookingSummary, { type BookingTotals } from "@/components/BookingSummary";
 import BookingWizard from "@/components/BookingWizard";
 import BookingConfirmationPrint from "@/components/BookingConfirmationPrint";
-import { useRooms, useEventSpaces } from "@/hooks/useCatalog";
+import { useRooms } from "@/hooks/useCatalog";
+import { canonicalRoomSlug } from "@/lib/data";
 import { saveBooking, sendBookingEmails } from "@/lib/booking";
 import { getAddOnById } from "@/data/addons";
 import {
@@ -14,7 +15,7 @@ import {
 } from "@/lib/utils";
 import { Loader2, Phone } from "lucide-react";
 import { siteConfig } from "@/lib/site";
-import type { AddOnSelection, BookingPayload, EventSpace, RoomCategory } from "@/types";
+import type { AddOnSelection, BookingPayload, RoomCategory } from "@/types";
 
 interface GuestInfo {
   name: string;
@@ -23,14 +24,11 @@ interface GuestInfo {
   requests: string;
 }
 
-const UNIT_LABELS = { room: "night", event: "day" } as const;
 
 export default function Booking() {
   const [searchParams] = useSearchParams();
   const { rooms, loading: roomsLoading } = useRooms();
-  const { spaces, loading: spacesLoading } = useEventSpaces();
 
-  const typeParam = searchParams.get("type");
   const slugParam = searchParams.get("slug");
   const checkinParam = searchParams.get("checkin");
   const checkoutParam = searchParams.get("checkout");
@@ -42,10 +40,7 @@ export default function Booking() {
     return isNaN(d.getTime()) ? undefined : d;
   };
 
-  const [type, setType] = useState<"room" | "event" | null>(
-    typeParam === "event" ? "event" : typeParam === "room" ? "room" : null
-  );
-  const [resource, setResource] = useState<RoomCategory | EventSpace | null>(null);
+  const [resource, setResource] = useState<RoomCategory | null>(null);
   const [step, setStep] = useState(1);
   const [checkIn, setCheckIn] = useState<Date | undefined>(parseDate(checkinParam));
   const [checkOut, setCheckOut] = useState<Date | undefined>(parseDate(checkoutParam));
@@ -59,54 +54,53 @@ export default function Booking() {
   const [error, setError] = useState<string | null>(null);
   const [bookingReference, setBookingReference] = useState("");
 
-  const catalog = type === "event" ? spaces : rooms;
-  const loading = type === "event" ? spacesLoading : roomsLoading;
+  const catalog = rooms;
+  const loading = roomsLoading;
 
   // Auto-select a resource from ?type=room&slug=...
   useEffect(() => {
-    if (!type || !slugParam || !catalog) return;
-    const found = catalog.find((r) => r.slug === slugParam);
+    if (!slugParam || !catalog) return;
+    const found = catalog.find((r) => r.slug === canonicalRoomSlug(slugParam));
     if (found) {
       setResource(found);
       setStep(1);
     }
-  }, [type, slugParam, catalog]);
+  }, [slugParam, catalog]);
 
   const totals = useMemo<BookingTotals>(() => {
     if (!resource) {
       return { subtotal: 0, addOnTotal: 0, total: 0, units: 0, unitLabel: "night" };
     }
     const nights = checkIn && checkOut ? nightsBetween(checkIn.toISOString(), checkOut.toISOString()) : 0;
-    const units = type === "room" ? nights * numRooms : Math.max(1, nights);
-    const unitPrice = type === "room" ? (resource as RoomCategory).price_per_night : (resource as EventSpace).price_per_day;
+    const units = nights * numRooms;
+    const unitPrice = resource.price_per_night;
     const subtotal = units * unitPrice;
     const addOnTotal = Object.entries(addOns).reduce((sum, [id, qty]) => {
       const svc = getAddOnById(id);
-      return svc && qty > 0 ? sum + svc.price * qty : sum;
+      return svc && qty > 0 ? sum + (svc.price ?? 0) * qty : sum;
     }, 0);
     return {
       subtotal,
       addOnTotal,
       total: subtotal + addOnTotal,
       units,
-      unitLabel: type === "room" ? "night" : "day",
+      unitLabel: "night",
     };
-  }, [resource, type, checkIn, checkOut, numRooms, addOns]);
+  }, [resource, checkIn, checkOut, numRooms, addOns]);
 
   const handleSubmit = async () => {
-    if (!resource || !checkIn || !checkOut || !type) return;
+    if (!resource || !checkIn || !checkOut) return;
     setSubmitting(true);
     setError(null);
 
     const reference = generateBookingReference();
-    const unitPrice = type === "room" ? (resource as RoomCategory).price_per_night : (resource as EventSpace).price_per_day;
+    const unitPrice = resource.price_per_night;
 
     // Capture a snapshot of the resource object before any state changes.
     const resourceSnapshot = {
       name: resource.name,
-      type,
       price: unitPrice,
-      unit: UNIT_LABELS[type],
+      unit: "night",
     };
 
     const addOnSelections: AddOnSelection[] = Object.entries(addOns)
@@ -114,16 +108,15 @@ export default function Booking() {
       .map(([id, quantity]) => ({ id, quantity }));
 
     const payload: BookingPayload = {
-      booking_type: type,
-      room_category_id: type === "room" ? resource.id : null,
-      event_space_id: type === "event" ? resource.id : null,
+      booking_type: "room",
+      room_category_id: resource.id,
       guest_name: guestInfo.name.trim(),
       guest_email: guestInfo.email.trim(),
       guest_phone: guestInfo.phone.trim(),
       check_in_date: checkIn.toISOString().split("T")[0],
       check_out_date: checkOut.toISOString().split("T")[0],
       number_of_guests: guests,
-      number_of_rooms: type === "room" ? numRooms : 1,
+      number_of_rooms: numRooms,
       add_on_services: addOnSelections,
       special_requests: guestInfo.requests.trim() || undefined,
       total_amount: totals.total,
@@ -152,7 +145,7 @@ export default function Booking() {
 
     sendBookingEmails({
       booking_reference: reference,
-      booking_type: type,
+      booking_type: "room",
       resource: resourceSnapshot,
       guest_name: payload.guest_name,
       guest_email: payload.guest_email,
@@ -172,7 +165,6 @@ export default function Booking() {
   };
 
   const handleReset = () => {
-    setType(null);
     setResource(null);
     setCheckIn(undefined);
     setCheckOut(undefined);
@@ -187,21 +179,21 @@ export default function Booking() {
     <>
       <Seo
         title="Book Your Stay"
-        description="Book a room or event space at Kakanfo Inn & Conference Centre, Ibadan. Choose your dates, add extras and confirm your stay in minutes."
-        keywords="book hotel Ibadan, book event space Ibadan, Kakanfo Inn booking"
+        description="Book a room or suite at Izzy Place Inn & Suites, Ibadan. Choose your dates, add extras and confirm your stay in minutes."
+        keywords="book hotel Ibadan, book rooms and suites Ibadan, Izzy Place Inn booking"
         path="/book"
       />
 
-      <section className="border-b border-forest-950/10 print:hidden">
+      <section className="border-b border-line print:hidden">
         <div className="container-site py-10 md:py-14">
           <p className="eyebrow">Reservations</p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-forest-900 md:text-4xl">
+          <h1 className="mt-2 font-display text-3xl font-semibold text-ink md:text-4xl">
             {step === 4 ? "Booking confirmed" : "Book your stay"}
           </h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
             {step === 4
               ? `Thank you, ${guestInfo.name.split(" ")[0]}. Your reservation is confirmed and a copy is on its way to your inbox.`
-              : "Rooms, event spaces and extras — all in one place. Confirmation is instant, payment is arranged over the phone."}
+              : "Choose your room, dates and any extras. Our team will contact you to arrange payment."}
           </p>
         </div>
       </section>
@@ -215,14 +207,7 @@ export default function Booking() {
           <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
             <div>
               <BookingWizard
-                type={type}
-                setType={(t) => {
-                  setType(t);
-                  setResource(null);
-                  setStep(1);
-                }}
                 rooms={rooms ?? []}
-                spaces={spaces ?? []}
                 resource={resource}
                 setResource={setResource}
                 step={step}
@@ -250,7 +235,6 @@ export default function Booking() {
 
             <div>
               <BookingSummary
-                type={type}
                 resource={resource}
                 checkIn={checkIn}
                 checkOut={checkOut}
@@ -277,7 +261,6 @@ export default function Booking() {
 
       {step === 4 && resource && (
         <BookingConfirmationPrint
-          type={type ?? "room"}
           resource={resource}
           checkIn={checkIn}
           checkOut={checkOut}

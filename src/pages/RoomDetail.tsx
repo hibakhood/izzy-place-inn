@@ -43,7 +43,7 @@ export default function RoomDetail() {
   return (
     <>
       <Seo
-        title={`${room.name} — ${siteConfig.shortName}`}
+        title={`${room.name}. ${siteConfig.shortName}`}
         description={room.description}
         keywords={`${room.name}, hotel room Ibadan, ${room.name.toLowerCase()} price`}
         image={room.images[0]}
@@ -78,14 +78,14 @@ export default function RoomDetail() {
         ]}
       />
 
-      <div className="border-b border-forest-950/10 pb-8 pt-24 md:pt-28">
+      <div className="border-b border-line pb-8 pt-24 md:pt-28">
         <div className="container-site">
           <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
             <Link to="/" className="hover:text-primary">Home</Link>
             <ChevronRight className="h-3.5 w-3.5" />
-            <Link to="/rooms" className="hover:text-primary">Rooms</Link>
+            <Link to="/rooms" className="hover:text-primary">Rooms &amp; Suites</Link>
             <ChevronRight className="h-3.5 w-3.5" />
-            <span className="font-semibold text-forest-900">{room.name}</span>
+            <span className="font-semibold text-ink">{room.name}</span>
           </nav>
         </div>
       </div>
@@ -97,7 +97,7 @@ export default function RoomDetail() {
             <img
               key={activeImage}
               src={gallery[activeImage]}
-              alt={`${room.name} — photo ${activeImage + 1}`}
+              alt={`${room.name}. Photo ${activeImage + 1}`}
               className="aspect-[4/3] w-full object-cover"
             />
           </div>
@@ -123,27 +123,27 @@ export default function RoomDetail() {
         {/* Details */}
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <Badge variant="brass">Room</Badge>
+            <Badge variant="brass">Room or Suite</Badge>
             {room.featured && <Badge>Featured</Badge>}
           </div>
-          <h1 className="mt-4 font-display text-3xl font-normal text-forest-950 sm:text-4xl">{room.name}</h1>
+          <h1 className="mt-4 font-display text-3xl font-normal text-ink sm:text-4xl">{room.name}</h1>
           <p className="mt-4 leading-relaxed text-muted-foreground">{room.description}</p>
 
           <div className="mt-6 flex flex-wrap gap-x-8 gap-y-4 text-sm">
-            <span className="flex items-center gap-2 text-forest-800">
+            <span className="flex items-center gap-2 text-ink">
               <Users className="h-4 w-4 text-primary" /> Up to {room.max_guests} guests
             </span>
-            <span className="flex items-center gap-2 text-forest-800">
+            <span className="flex items-center gap-2 text-ink">
               <Maximize className="h-4 w-4 text-primary" /> {room.size_sqm} m²
             </span>
-            <span className="flex items-center gap-2 text-forest-800">
+            <span className="flex items-center gap-2 text-ink">
               <BedDouble className="h-4 w-4 text-primary" /> {room.total_rooms} of this category
             </span>
           </div>
 
           <Separator className="my-7" />
 
-          <h2 className="font-display text-xl font-medium text-forest-950">Room amenities</h2>
+          <h2 className="font-display text-xl font-medium text-ink">Room &amp; suite amenities</h2>
           <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {room.amenities.map((a) => (
               <li key={a} className="flex items-center gap-2.5 text-sm">
@@ -161,7 +161,7 @@ export default function RoomDetail() {
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-brass-500/70 via-brass-500/40 to-transparent" />
             <div>
               <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-cream-200/60">Per night</p>
-              <p className="mt-1 font-display text-3xl font-light text-cream-100">
+              <p className="mt-1 font-display text-3xl font-light text-ivory-soft">
                 {formatNaira(room.price_per_night)}
               </p>
             </div>

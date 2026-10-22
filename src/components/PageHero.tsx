@@ -28,7 +28,7 @@ export default function PageHero({ eyebrow, title, description, image, children 
             {eyebrow}
           </span>
         </p>
-        <h1 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-light leading-[1.05] text-cream-100 sm:text-5xl md:text-6xl">
+        <h1 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-light leading-[1.05] text-ivory-soft sm:text-5xl md:text-6xl">
           {title}
         </h1>
         {description && (

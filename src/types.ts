@@ -12,25 +12,11 @@ export interface RoomCategory {
   featured: boolean;
 }
 
-export interface EventSpace {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  capacity: number;
-  size_sqm: number;
-  price_per_day: number;
-  setup_styles: string[];
-  amenities: string[];
-  images: string[];
-  featured: boolean;
-}
-
 export interface AddOnService {
   id: string;
   name: string;
   description: string;
-  price: number;
+  price: number | null;
   category: "transport" | "dining" | "amenities" | "wellness" | "other";
   icon: string;
   available: boolean;
@@ -41,12 +27,11 @@ export interface AddOnSelection {
   quantity: number;
 }
 
-export type BookingType = "room" | "event";
+export type BookingType = "room";
 
 export interface BookingPayload {
   booking_type: BookingType;
   room_category_id?: string | null;
-  event_space_id?: string | null;
   guest_name: string;
   guest_email: string;
   guest_phone: string;
@@ -73,7 +58,7 @@ export interface GalleryImage {
   id: string;
   src: string;
   alt: string;
-  category: "rooms" | "facilities" | "events";
+  category: "rooms" | "facilities";
 }
 
 export interface DiningVenue {

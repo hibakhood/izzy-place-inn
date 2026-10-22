@@ -49,7 +49,7 @@ export function generateBookingReference(): string {
   for (let i = 0; i < 6; i++) {
     out += chars[Math.floor(Math.random() * chars.length)];
   }
-  return `KI-${out}`;
+  return `IP-${out}`;
 }
 
 export function slugify(text: string): string {

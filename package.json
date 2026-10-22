@@ -1,8 +1,13 @@
 {
-  "name": "kakanfo-inn",
+  "name": "izzy-place-inn",
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hibakhood/izzy-place-inn.git"
+  },
+  "homepage": "https://izzyplaceinn.com",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

@@ -5,24 +5,23 @@ import Logo from "./Logo";
 
 export default function Footer() {
   return (
-    <footer className="bg-forest-950 text-cream-200">
+    <footer className="border-y border-line bg-mist text-muted-foreground">
       <div className="container-site pt-20 md:pt-24">
         <div className="grid gap-14 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <Logo light />
-            <p className="mt-6 max-w-sm text-sm leading-relaxed text-cream-200/60">
-              A full service hotel and conference centre on Ring Road, Ibadan —
-              stylish rooms, a business class event venue, and warm Yoruba
-              hospitality since day one.
+            <Logo footer />
+            <p className="mt-6 max-w-sm text-sm leading-relaxed text-muted-foreground">
+              Comfortable rooms and suites off Old Ife Road in Ibadan.
+              Friendly staff, free Wi-Fi and reception open 24 hours a day.
             </p>
             <div className="mt-8 flex items-center gap-3 text-sm">
               <span className="flex h-2 w-2 rounded-full bg-brass-400" />
-              <span className="text-cream-200/80">{siteConfig.reception}</span>
+              <span className="text-muted-foreground">{siteConfig.reception}</span>
             </div>
           </div>
 
           <div>
-            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-brass-300">
+            <h3 className="eyebrow text-ink">
               Explore
             </h3>
             <ul className="mt-6 space-y-3 text-sm">
@@ -30,7 +29,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     to={link.href}
-                    className="text-cream-200/70 transition-colors hover:text-white"
+                    className="text-muted-foreground transition-colors hover:text-gold-deep"
                   >
                     {link.label}
                   </Link>
@@ -40,10 +39,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-brass-300">
+            <h3 className="eyebrow text-ink">
               Contact
             </h3>
-            <ul className="mt-6 space-y-4 text-sm text-cream-200/70">
+            <ul className="mt-6 space-y-4 text-sm text-muted-foreground">
               <li className="flex items-start gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brass-400/80" />
                 <span>
@@ -51,7 +50,9 @@ export default function Footer() {
                   <br />
                   {siteConfig.address.line2},
                   <br />
-                  {siteConfig.address.city}, {siteConfig.address.country}
+                  {siteConfig.address.city}, {siteConfig.address.state}
+                  <br />
+                  {siteConfig.address.country}
                 </span>
               </li>
               <li className="flex items-center gap-3">
@@ -61,7 +62,7 @@ export default function Footer() {
                     <a
                       key={p}
                       href={`tel:+234${p.slice(1)}`}
-                      className="transition-colors hover:text-white"
+                      className="transition-colors hover:text-gold-deep"
                     >
                       {p}
                     </a>
@@ -73,7 +74,7 @@ export default function Footer() {
                   <a
                     key={email}
                     href={`mailto:${email}`}
-                    className="flex items-center gap-3 transition-colors hover:text-white"
+                    className="flex items-center gap-3 transition-colors hover:text-gold-deep"
                   >
                     <Mail className="h-4 w-4 shrink-0 text-brass-400/80" />
                     {email}
@@ -84,23 +85,22 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-brass-300">
+            <h3 className="eyebrow text-ink">
               Visit
             </h3>
-            <p className="mt-6 flex items-center gap-3 text-sm text-cream-200/70">
+            <p className="mt-6 flex items-center gap-3 text-sm text-muted-foreground">
               <Clock className="h-4 w-4 shrink-0 text-brass-400/80" />
               {siteConfig.reception}
             </p>
-            <p className="mt-4 text-sm leading-relaxed text-cream-200/60">
-              Our front desk never closes. Arrive at any hour — a warm welcome
-              is always waiting.
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Our reception is open day and night. Call us if you need help with your arrival.
             </p>
           </div>
         </div>
       </div>
 
       <div className="container-site mt-16">
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-cream-100/10 py-7 text-xs text-cream-200/45 sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-line py-7 text-xs text-muted-foreground sm:flex-row">
           <p>
             © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
           </p>

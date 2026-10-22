@@ -3,14 +3,14 @@ import type { BookingPayload } from "@/types";
 
 export interface EmailAddOnPayload {
   name: string;
-  price: number;
+  price: number | null;
   quantity: number;
 }
 
 export interface BookingEmailPayload {
   booking_reference: string;
-  booking_type: string;
-  resource: { name: string; type: string; price: number; unit: string };
+  booking_type: "room";
+  resource: { name: string; price: number; unit: string };
   guest_name: string;
   guest_email: string;
   guest_phone: string;

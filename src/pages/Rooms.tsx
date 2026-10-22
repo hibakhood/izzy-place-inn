@@ -15,8 +15,8 @@ export default function Rooms() {
     <>
       <Seo
         title="Rooms & Suites"
-        description="Browse rooms and suites at Kakanfo Inn & Conference Centre, Ibadan — from Classic Studios and Luxury Rooms to the Presidential Suites."
-        keywords="hotel rooms Ibadan, book a room Ibadan, luxury suites Ibadan, Kakanfo Inn rooms"
+        description="Browse rooms and suites at Izzy Place Inn & Suites, Ibadan. Classic Room, Deluxe Room, Executive Suite and Family Room."
+        keywords="hotel rooms Ibadan, book a room Ibadan, luxury suites Ibadan, Izzy Place Inn rooms"
         path="/rooms"
       />
       <JsonLd
@@ -49,8 +49,8 @@ export default function Rooms() {
       <PageHero
         eyebrow="Accommodation"
         title="Rooms & Suites"
-        description="Ninety-five rooms across five categories — Classic Studios, Luxury Rooms, Classic Suites and one- and two-bedroom Presidential Suites — each finished to premium, modern 5-star comfort. Whatever brings you to Ibadan, there is a room here that fits."
-        image={asset("/images/rooms/luxury-room-hero.jpg")}
+        description="Choose from our Classic Room, Deluxe Room, Executive Suite and Family Room. Find the space that suits your visit and budget."
+        image={asset("/images/rooms/deluxe-view-3.jpg")}
       />
 
       <section className="container-site py-12 md:py-16">
@@ -69,7 +69,7 @@ export default function Rooms() {
 
       <CallToAction
         title="Not sure which room fits?"
-        subtitle="Call our reception and we will help you choose — same warm welcome, no pressure."
+        subtitle="Call reception if you need help choosing a room."
       />
     </>
   );

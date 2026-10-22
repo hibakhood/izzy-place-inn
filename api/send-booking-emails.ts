@@ -27,7 +27,7 @@ export default async function handler(req: Request): Promise<Response> {
       to: [body.guest_email],
       subject: `Booking Confirmed — ${body.booking_reference} · ${body.resource.name}`,
       html: guestEmail,
-      from_name: "Kakanfo Inn and Conference Centre",
+      from_name: "Izzy Place Inn & Suites",
     });
 
     const adminEmailAddress = process.env.ADMIN_EMAIL;
@@ -37,7 +37,7 @@ export default async function handler(req: Request): Promise<Response> {
       to: adminRecipients,
       subject: `New Booking ${body.booking_reference} — ${body.guest_name}`,
       html: adminEmailContent,
-      from_name: "Kakanfo Inn and Conference Centre",
+      from_name: "Izzy Place Inn & Suites",
     });
 
     return Response.json({ ok: true, guest: guest.id, admin: admin.id });

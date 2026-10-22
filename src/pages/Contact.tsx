@@ -11,8 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { siteConfig } from "@/lib/site";
 
 const ENQUIRY_TYPES = [
-  "Room booking enquiry",
-  "Events & conference",
+  "Room & suite enquiry",
   "Dining & restaurant",
   "Corporate partnership",
   "Feedback",
@@ -37,9 +36,13 @@ const CONTACTS = [
   {
     icon: MapPin,
     title: "Find us",
-    lines: [siteConfig.address.line1, `${siteConfig.address.line2}, ${siteConfig.address.city}`],
+    lines: [
+      siteConfig.address.line1,
+      siteConfig.address.line2,
+      `${siteConfig.address.city}, ${siteConfig.address.state}`,
+    ],
     note: siteConfig.address.country,
-    href: "https://www.google.com/maps/dir//Kakanfo+Inn+%26+Conference+Centre,+1+Nihinlola+Street,+MKO+Abiola+Way,+off+Joyce+'B'+Road,+New+Gra,+Ibadan+200252,+Oyo/@6.504448,3.3554432,12z/data=!4m8!4m7!1m0!1m5!1m1!1s0x10398de9b28fb5d9:0xd5ad9d092fb39aeb!2m2!1d3.8655318!2d7.3675851?hl=en-GB&entry=ttu&g_ep=EgoyMDI2MDgxMi4wIKXMDSoASAFQAw%3D%3D",
+    href: siteConfig.directionsUrl,
   },
   {
     icon: Clock,
@@ -85,8 +88,8 @@ export default function Contact() {
     <>
       <Seo
         title="Contact Us"
-        description="Get in touch with Kakanfo Inn & Conference Centre, Ibadan. Call our 24-hour reception, email us, or send an enquiry and we will reply within a few hours."
-        keywords="contact Kakanfo Inn, Kakanfo Inn Ibadan address, hotel phone number Ibadan, conference venue enquiry"
+        description="Get in touch with Izzy Place Inn & Suites, Ibadan. Call our 24-hour reception on Old Ife Road, email us, or send an enquiry and we will reply within a few hours."
+        keywords="contact Izzy Place Inn, Izzy Place Inn Ibadan address, hotel phone number Ibadan, room booking enquiry"
         path="/contact"
       />
 
@@ -94,7 +97,7 @@ export default function Contact() {
         eyebrow="Contact"
         title="We are always in"
         description="Reception runs around the clock, so there is always a human on the other end. Reach us however suits you."
-        image={asset("/images/facilities/reception-1.jpg")}
+        image={asset("/images/facilities/lobby.jpg")}
       />
 
       <section className="container-site py-12 md:py-16">
@@ -106,9 +109,9 @@ export default function Contact() {
                 <div className="flex h-11 w-11 items-center justify-center rounded-md bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 font-semibold text-forest-900">{c.title}</h3>
+                <h3 className="mt-4 font-semibold text-ink">{c.title}</h3>
                 {c.lines.map((l) => (
-                  <p key={l} className="mt-1 text-sm text-forest-800">
+                  <p key={l} className="mt-1 text-sm text-ink">
                     {l}
                   </p>
                 ))}
@@ -135,15 +138,15 @@ export default function Contact() {
 
         <div className="mt-14 grid gap-10 lg:grid-cols-2">
           <div>
-            <h2 className="font-display text-2xl font-semibold text-forest-900">Send us an enquiry</h2>
+            <h2 className="font-display text-2xl font-semibold text-ink">Send us an enquiry</h2>
             <p className="mt-2 text-muted-foreground">
-              Tell us what you are planning and we will get back to you — typically within a few hours.
+              Send us your question and we will get back to you.
             </p>
 
             {status === "sent" ? (
               <div className="mt-8 rounded-lg border border-primary/30 bg-primary/5 p-8 text-center">
                 <CheckCircle2 className="mx-auto h-10 w-10 text-primary" />
-                <h3 className="mt-4 font-display text-xl font-semibold text-forest-900">Message sent</h3>
+                <h3 className="mt-4 font-display text-xl font-semibold text-ink">Message sent</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Thank you, {form.name.split(" ")[0]}. We have received your enquiry and will reply to{" "}
                   <strong>{form.email}</strong> shortly.
@@ -243,7 +246,7 @@ export default function Contact() {
 
           <div className="overflow-hidden rounded-lg border border-border/70">
             <iframe
-              title="Kakanfo Inn & Conference Centre location"
+              title="Izzy Place Inn & Suites location"
               src={siteConfig.mapEmbed}
               className="h-full min-h-[420px] w-full"
               loading="lazy"

@@ -56,8 +56,8 @@ export default function GalleryLightbox({ images, columns = 3 }: GalleryLightbox
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 flex flex-col items-center justify-between bg-forest-950/0 p-3 transition-colors group-hover:bg-forest-950/40">
-              <ZoomIn className="mt-3 h-6 w-6 text-cream-100 opacity-0 transition-opacity group-hover:opacity-100" />
-              <span className="mb-1 w-full truncate rounded bg-forest-950/70 px-2 py-1 text-center text-xs font-semibold uppercase tracking-wide text-cream-100 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+              <ZoomIn className="mt-3 h-6 w-6 text-ivory-soft opacity-0 transition-opacity group-hover:opacity-100" />
+              <span className="mb-1 w-full truncate rounded bg-forest-950/70 px-2 py-1 text-center text-xs font-semibold uppercase tracking-wide text-ivory-soft opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
                 {img.alt}
               </span>
             </div>
@@ -77,7 +77,7 @@ export default function GalleryLightbox({ images, columns = 3 }: GalleryLightbox
             <button
               onClick={close}
               aria-label="Close lightbox"
-              className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-cream-100 transition-colors hover:bg-white/20"
+              className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-ivory/10 text-ivory-soft transition-colors hover:bg-ivory/20"
             >
               <X className="h-6 w-6" />
             </button>
@@ -87,7 +87,7 @@ export default function GalleryLightbox({ images, columns = 3 }: GalleryLightbox
                 prev();
               }}
               aria-label="Previous image"
-              className="absolute left-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-cream-100 transition-colors hover:bg-white/20 sm:left-8"
+              className="absolute left-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ivory/10 text-ivory-soft transition-colors hover:bg-ivory/20 sm:left-8"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
@@ -97,7 +97,7 @@ export default function GalleryLightbox({ images, columns = 3 }: GalleryLightbox
                 next();
               }}
               aria-label="Next image"
-              className="absolute right-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-cream-100 transition-colors hover:bg-white/20 sm:right-8"
+              className="absolute right-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ivory/10 text-ivory-soft transition-colors hover:bg-ivory/20 sm:right-8"
             >
               <ChevronRight className="h-6 w-6" />
             </button>

@@ -1,7 +1,8 @@
-# Kakanfo Inn & Conference Centre
+# Izzy Place Inn & Suites
 
-Official website for Kakanfo Inn & Conference Centre, Ibadan — a full-service hotel and
-conference venue. Rooms, event spaces, add-on services, and an online booking flow.
+Official website for Izzy Place Inn & Suites, Ibadan — a full-service hotel and
+suites on Old Ife Road. Rooms and suites, add-on services, and an online
+booking flow.
 
 ## Stack
 
@@ -26,9 +27,9 @@ and bookings confirm without persisting to a database.
 ```
 src/
   components/       UI + page components (BookingSummary, BookingWizard, ...)
-  pages/            Route-level pages (Home, Rooms, Events, Booking, Contact, ...)
-  data/             Fallback catalog (rooms, event spaces, add-ons, content)
-  hooks/            Data-loading hooks (useRooms, useEventSpaces)
+  pages/            Route-level pages (Home, Rooms, Booking, Gallery, Contact, ...)
+  data/             Fallback catalog (rooms, add-ons, content)
+  hooks/            Data-loading hooks (useRooms)
   lib/              utils, site config, supabase client, booking/email helpers
 api/                Vercel serverless functions (send-booking-emails, contact)
 lib/base44/         base44.integrations.Core email integration (Resend)
@@ -37,7 +38,7 @@ supabase/           schema.sql + seed.sql
 
 ## Booking flow
 
-1. Choose a **room** or **event space** (`/book?type=room&slug=luxury-room` pre-selects)
+1. Choose a **room or suite** (`/#/booking?slug=deluxe-room` pre-selects)
 2. Pick **dates** + number of guests/rooms
 3. Enter **guest details**
 4. Add optional **add-on services**
@@ -52,10 +53,9 @@ supabase/           schema.sql + seed.sql
 
 ## Content note
 
-Company copy (vision, mission, core values, history, chairman, room inventory and
-dining venues) is drawn from the official Kakanfo Inn magazine, and all photography
-is the hotel's own (staged in `public/images/`). Room and venue **prices, size
-estimates and the add-on catalogue are reasonable estimates** pending final figures
-from the hotel — they live in `src/data/*` (and `supabase/seed.sql`) and are easy to
-swap for the real numbers. Room-category counts total 95 but are approximate.
-Testimonials are illustrative placeholders.
+Brand, positioning and amenity copy was written for Izzy Place Inn & Suites, and all
+photography is staged in `public/images/`. Room **prices, size estimates and the add-on
+catalogue are reasonable estimates** pending final figures from the hotel — they live in
+`src/data/*` (and `supabase/seed.sql`) and are easy to swap for the real numbers.
+Room-category counts total 25 and are approximate. Testimonials are illustrative
+placeholders.

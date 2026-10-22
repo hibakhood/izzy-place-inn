@@ -46,7 +46,7 @@ export default async function handler(req: Request): Promise<Response> {
       to: recipients,
       subject: `Website enquiry — ${body.subject || body.name}`,
       html,
-      from_name: "Kakanfo Inn and Conference Centre",
+      from_name: "Izzy Place Inn & Suites",
     });
 
     return Response.json({ ok: true, id: result.id });

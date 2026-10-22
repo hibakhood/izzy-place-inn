@@ -43,7 +43,7 @@ export default function Seo({
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
 
-      <meta name="theme-color" content="#0C3B24" />
+      <meta name="theme-color" content="#1d241f" />
     </Helmet>
   );
 }

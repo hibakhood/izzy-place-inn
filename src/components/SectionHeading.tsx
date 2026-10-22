@@ -31,7 +31,7 @@ export default function SectionHeading({
         <p
           className={cn(
             "mb-4 text-[0.7rem] font-semibold uppercase tracking-[0.3em]",
-            align === "center" ? "text-brass-500" : "eyebrow-rule text-brass-500",
+            align === "center" ? "text-gold-deep" : "eyebrow-rule text-gold-deep",
             light && "text-brass-300"
           )}
         >
@@ -41,7 +41,7 @@ export default function SectionHeading({
       <h2
         className={cn(
           "font-display text-3xl font-normal leading-[1.08] tracking-tight sm:text-4xl md:text-[2.75rem]",
-          light ? "text-cream-100" : "text-forest-950"
+          light ? "text-ivory-soft" : "text-ink"
         )}
       >
         {title}

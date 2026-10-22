@@ -25,7 +25,7 @@ import { addOnServices } from "@/data/addons";
 import { iconMap } from "@/lib/icons";
 import { formatNaira, cn } from "@/lib/utils";
 import type { BookingTotals } from "./BookingSummary";
-import type { AddOnService, EventSpace, RoomCategory } from "@/types";
+import type { AddOnService, RoomCategory } from "@/types";
 
 interface GuestInfo {
   name: string;
@@ -35,12 +35,10 @@ interface GuestInfo {
 }
 
 interface BookingWizardProps {
-  type: "room" | "event" | null;
-  setType: (t: "room" | "event" | null) => void;
+
   rooms: RoomCategory[];
-  spaces: EventSpace[];
-  resource: RoomCategory | EventSpace | null;
-  setResource: (r: RoomCategory | EventSpace) => void;
+  resource: RoomCategory | null;
+  setResource: (r: RoomCategory) => void;
   step: number;
   setStep: (n: number) => void;
   checkIn?: Date;
@@ -90,7 +88,7 @@ function QtyStepper({
           type="button"
           onClick={() => onChange(Math.max(min, value - 1))}
           aria-label={`Decrease ${label}`}
-          className="flex h-9 w-9 items-center justify-center text-forest-800 transition-colors hover:bg-secondary disabled:opacity-40"
+          className="flex h-9 w-9 items-center justify-center text-ink transition-colors hover:bg-secondary disabled:opacity-40"
           disabled={value <= min}
         >
           <Minus className="h-4 w-4" />
@@ -100,7 +98,7 @@ function QtyStepper({
           type="button"
           onClick={() => onChange(Math.min(max, value + 1))}
           aria-label={`Increase ${label}`}
-          className="flex h-9 w-9 items-center justify-center text-forest-800 transition-colors hover:bg-secondary disabled:opacity-40"
+          className="flex h-9 w-9 items-center justify-center text-ink transition-colors hover:bg-secondary disabled:opacity-40"
           disabled={value >= max}
         >
           <Plus className="h-4 w-4" />
@@ -131,9 +129,9 @@ function AddOnCard({
         <Icon className="h-5 w-5" />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between gap-2">
-          <h4 className="font-semibold text-forest-900">{service.name}</h4>
-          <p className="shrink-0 text-sm font-semibold text-primary">{formatNaira(service.price)}</p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h4 className="font-semibold text-ink">{service.name}</h4>
+          <p className="shrink-0 text-sm font-semibold text-primary">{service.price === null ? "Rate varies" : formatNaira(service.price)}</p>
         </div>
         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{service.description}</p>
         <div className="mt-3">
@@ -151,7 +149,7 @@ function AddOnCard({
 
 export default function BookingWizard(props: BookingWizardProps) {
   const {
-    type, setType, rooms, spaces, resource, setResource,
+    rooms, resource, setResource,
     step, setStep, checkIn, checkOut, setCheckIn, setCheckOut,
     guests, setGuests, numRooms, setNumRooms,
     guestInfo, setGuestInfo, addOns, setAddOns,
@@ -166,7 +164,7 @@ export default function BookingWizard(props: BookingWizardProps) {
   const step2Valid = guestInfo.name.trim().length >= 2 && emailValid && guestInfo.phone.trim().length >= 7;
   const finalStep = step === 4;
 
-  const pickResource = (r: RoomCategory | EventSpace) => {
+  const pickResource = (r: RoomCategory) => {
     setResource(r);
     setStep(1);
   };
@@ -177,66 +175,36 @@ export default function BookingWizard(props: BookingWizardProps) {
 
   return (
     <div>
-      {/* Resource selection (step 0) */}
+      {/* Room selection (step 0) */}
       <div className="mb-8">
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setType("room")}
-            className={cn(
-              "rounded-sm border px-5 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition-colors",
-              type === "room"
-                ? "border-forest-950 bg-forest-950 text-cream-100"
-                : "border-forest-950/15 bg-transparent text-forest-800 hover:border-forest-950/40"
-            )}
-          >
-            Book a Room
-          </button>
-          <button
-            onClick={() => setType("event")}
-            className={cn(
-              "rounded-sm border px-5 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition-colors",
-              type === "event"
-                ? "border-forest-950 bg-forest-950 text-cream-100"
-                : "border-forest-950/15 bg-transparent text-forest-800 hover:border-forest-950/40"
-            )}
-          >
-            Book an Event Space
-          </button>
+        <p className="mb-3 text-sm font-medium text-ink">
+          Choose your room or suite:
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {rooms.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => pickResource(r)}
+              className={cn(
+                "flex items-center gap-3 rounded-lg border p-3 text-left transition-all",
+                resource?.id === r.id
+                  ? "border-primary bg-primary/5 ring-1 ring-primary"
+                  : "border-border/70 bg-card hover:border-primary/40"
+              )}
+            >
+              <img src={r.images[0]} alt="" className="h-14 w-20 shrink-0 rounded-md object-cover" />
+              <span className="min-w-0">
+                <span className="block truncate font-semibold text-ink">{r.name}</span>
+                <span className="block text-sm text-primary">
+                  {formatNaira(r.price_per_night)}/night
+                </span>
+              </span>
+              {resource?.id === r.id && (
+                <Check className="ml-auto h-5 w-5 shrink-0 text-primary" />
+              )}
+            </button>
+          ))}
         </div>
-
-        {type && (
-          <div className="mt-5">
-            <p className="mb-3 text-sm font-medium text-forest-900">
-              Choose your {type === "room" ? "room" : "event space"}:
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {(type === "room" ? rooms : spaces).map((r) => (
-                <button
-                  key={r.id}
-                  onClick={() => pickResource(r)}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg border p-3 text-left transition-all",
-                    resource?.id === r.id
-                      ? "border-primary bg-primary/5 ring-1 ring-primary"
-                      : "border-border/70 bg-card hover:border-primary/40"
-                  )}
-                >
-                  <img src={r.images[0]} alt="" className="h-14 w-20 shrink-0 rounded-md object-cover" />
-                  <span className="min-w-0">
-                    <span className="block truncate font-semibold text-forest-900">{r.name}</span>
-                    <span className="block text-sm text-primary">
-                      {formatNaira("price_per_night" in r ? r.price_per_night : r.price_per_day)}
-                      {"price_per_night" in r ? "/night" : "/day"}
-                    </span>
-                  </span>
-                  {resource?.id === r.id && (
-                    <Check className="ml-auto h-5 w-5 shrink-0 text-primary" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Step indicator */}
@@ -261,7 +229,7 @@ export default function BookingWizard(props: BookingWizardProps) {
                 <span
                   className={cn(
                     "hidden text-sm font-semibold sm:block",
-                    active ? "text-forest-900" : "text-muted-foreground"
+                    active ? "text-ink" : "text-muted-foreground"
                   )}
                 >
                   {s.label}
@@ -273,17 +241,15 @@ export default function BookingWizard(props: BookingWizardProps) {
         </div>
       )}
 
-      {/* STEP 1 — Dates & guests */}
+      {/* STEP 1. Dates & guests */}
       {step === 1 && (
         <div className="space-y-8">
           <div>
-            <h3 className="font-display text-xl font-semibold text-forest-900">
-              {type === "room" ? "Choose your dates" : "Choose your event date(s)"}
+            <h3 className="font-display text-xl font-semibold text-ink">
+              Choose your dates
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              {type === "room"
-                ? "Pick your check-in and check-out dates."
-                : "Pick the start and end of your event booking."}
+              Pick your check-in and check-out dates.
             </p>
             <div className="mt-5 rounded-lg border border-border/70 bg-card p-4">
               <Calendar
@@ -302,9 +268,7 @@ export default function BookingWizard(props: BookingWizardProps) {
               <p className="mt-3 text-sm text-destructive">Please select both a start and end date.</p>
             ) : (
               <p className="mt-3 text-sm text-primary">
-                {type === "room"
-                  ? `${totals.units} night(s) selected`
-                  : `${totals.units} day(s) selected`}
+                {totals.units} night(s) selected
               </p>
             )}
           </div>
@@ -313,9 +277,7 @@ export default function BookingWizard(props: BookingWizardProps) {
 
           <div className="flex flex-wrap items-end gap-8">
             <QtyStepper label="Number of guests" value={guests} onChange={setGuests} min={1} max={100} />
-            {type === "room" && (
-              <QtyStepper label="Number of rooms" value={numRooms} onChange={setNumRooms} min={1} max={10} />
-            )}
+            <QtyStepper label="Number of rooms" value={numRooms} onChange={setNumRooms} min={1} max={10} />
           </div>
 
           <div className="flex justify-end">
@@ -331,11 +293,11 @@ export default function BookingWizard(props: BookingWizardProps) {
         </div>
       )}
 
-      {/* STEP 2 — Guest info */}
+      {/* STEP 2. Guest info */}
       {step === 2 && (
         <div className="space-y-6">
           <div>
-            <h3 className="font-display text-xl font-semibold text-forest-900">Your details</h3>
+            <h3 className="font-display text-xl font-semibold text-ink">Your details</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               We will send your booking confirmation to this email.
             </p>
@@ -378,7 +340,7 @@ export default function BookingWizard(props: BookingWizardProps) {
               <Label htmlFor="guest-requests">Special requests (optional)</Label>
               <Textarea
                 id="guest-requests"
-                placeholder="Arrival time, dietary needs, event setup notes..."
+                placeholder="Arrival time, dietary needs, extra pillows..."
                 value={guestInfo.requests}
                 onChange={(e) => setGuestInfo({ ...guestInfo, requests: e.target.value })}
               />
@@ -399,13 +361,13 @@ export default function BookingWizard(props: BookingWizardProps) {
         </div>
       )}
 
-      {/* STEP 3 — Add-ons */}
+      {/* STEP 3. Add-ons */}
       {step === 3 && (
         <div className="space-y-6">
           <div>
-            <h3 className="font-display text-xl font-semibold text-forest-900">Add-on services</h3>
+            <h3 className="font-display text-xl font-semibold text-ink">Add-on services</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Optional extras to make your {type === "room" ? "stay" : "event"} effortless. Skip anything you do not need.
+              Rates vary and will be provided by a management representative. Add-on charges are not included in the room total.
             </p>
           </div>
 
@@ -444,27 +406,27 @@ export default function BookingWizard(props: BookingWizardProps) {
         </div>
       )}
 
-      {/* STEP 4 — Confirmation */}
+      {/* STEP 4. Confirmation */}
       {finalStep && (
         <div className="mx-auto max-w-xl rounded-lg border border-border/70 bg-card p-8 text-center sm:p-10">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <CheckCircle2 className="h-9 w-9 text-primary" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
+            <CheckCircle2 className="h-9 w-9 text-success" />
           </div>
-          <h3 className="mt-6 font-display text-2xl font-semibold text-forest-900">You're all set!</h3>
+          <h3 className="mt-6 font-display text-2xl font-semibold text-ink">You're all set!</h3>
           <p className="mt-2 text-muted-foreground">
-            Your {type === "room" ? "booking" : "event booking"} is confirmed. We have sent a confirmation to{" "}
-            <strong className="text-forest-900">{guestInfo.email}</strong>.
+            Your booking is confirmed. We have sent a confirmation to{" "}
+            <strong className="text-ink">{guestInfo.email}</strong>.
           </p>
 
           <div className="mt-6 rounded-md bg-cream-100 p-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Booking reference
             </p>
-            <p className="mt-1 font-display text-3xl font-semibold tracking-widest text-forest-900">
+            <p className="mt-1 font-display text-3xl font-semibold tracking-widest text-ink">
               {bookingReference}
             </p>
-            <div className="mt-4 flex items-center justify-center gap-2 text-sm text-forest-800">
-              <PartyPopper className="h-4 w-4 text-brass-600" />
+            <div className="mt-4 flex items-center justify-center gap-2 text-sm text-ink">
+              <PartyPopper className="h-4 w-4 text-gold-deep" />
               {resource?.name}
             </div>
           </div>
