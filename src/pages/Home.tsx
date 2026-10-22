@@ -204,34 +204,6 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* STATS */}
-      <section className="border-y border-line bg-background">
-        <div className="container-site grid grid-cols-2 md:grid-cols-4">
-          {[
-            [String(siteConfig.rooms), "Rooms & Suites"],
-            ["4", "Room Categories"],
-            ["3", "Dining Venues"],
-            ["24/7", "Reception & Security"],
-          ].map(([value, label], i) => (
-            <Reveal
-              key={label}
-              delay={i * 0.08}
-              className={cn(
-                "px-6 py-10 text-center md:py-12",
-                i % 2 === 1 && "border-l border-line",
-                i >= 2 && "border-t border-line md:border-t-0",
-                i >= 1 && "md:border-l md:border-line"
-              )}
-            >
-              <p className="font-display text-4xl font-light text-ink md:text-5xl">{value}</p>
-              <p className="mt-2 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                {label}
-              </p>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
       {/* AMENITIES */}
       <section className="py-14 md:py-20">
         <div className="container-site">
@@ -276,8 +248,8 @@ export default function Home() {
             <div className="relative isolate px-3 pt-0 sm:px-5">
               <div aria-hidden="true" className="absolute inset-x-0 bottom-0 top-5 -z-10 rounded-t-xl border border-line" />
               <img
-                src={asset("/images/facilities/outdoor-image.jpg")}
-                alt="Exterior of Izzy Place Inn & Suites"
+                src={asset("/images/facilities/lobby-1.jpg")}
+                alt="Lobby at Izzy Place Inn & Suites"
                 loading="lazy"
                 className="aspect-[4/5] w-full rounded-t-[50%_42%] object-cover lg:aspect-[4/5.3]"
               />
