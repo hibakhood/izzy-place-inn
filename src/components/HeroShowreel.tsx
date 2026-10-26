@@ -8,11 +8,11 @@ const POSTER = "/images/facilities/outdoor-image.jpg";
 export default function HeroShowreel() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [source, setSource] = useState(() =>
-    window.matchMedia("(max-width: 768px)").matches ? COMPATIBLE : DESKTOP,
+    typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches ? COMPATIBLE : DESKTOP,
   );
   const [failed, setFailed] = useState(false);
   const [still, setStill] = useState(() =>
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
 
   const play = useCallback(() => {

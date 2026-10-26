@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import { HttpError } from "../../server/http";
 
 export interface SendEmailArgs {
   to: string[];
@@ -6,43 +6,32 @@ export interface SendEmailArgs {
   html: string;
   from_name?: string;
   from_email?: string;
+  idempotencyKey?: string;
+  replyTo?: string;
 }
-
-/**
- * base44.integrations.Core.SendEmail
- *
- * Shared email integration. Uses Resend behind a stable interface so the rest
- * of the app never talks to a vendor directly. Set RESEND_API_KEY in the
- * Vercel environment.
- */
+export function requireEmailConfiguration() {
+  if (!process.env.RESEND_API_KEY || !process.env.RESEND_FROM_EMAIL) {
+    throw new HttpError(503, "Email is temporarily unavailable. Please call reception.");
+  }
+}
 export const Core = {
-  SendEmail: async ({
-    to,
-    subject,
-    html,
-    from_name = "Izzy Place Inn & Suites",
-    from_email = "bookings@izzyplaceinn.com",
-  }: SendEmailArgs): Promise<{ id: string }> => {
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      console.warn("[base44.integrations.Core.SendEmail] RESEND_API_KEY is not set; skipping send.");
-      return { id: "" };
-    }
-
-    const resend = new Resend(apiKey);
-    const { data, error } = await resend.emails.send({
-      from: `${from_name} <${from_email}>`,
-      to,
-      subject,
-      html,
+  async SendEmail({ to, subject, html, from_name = "Izzy Place Inn & Suites", from_email, idempotencyKey, replyTo }: SendEmailArgs): Promise<{ id: string }> {
+    requireEmailConfiguration();
+    if (!to.length) throw new Error("Missing recipients");
+    const result = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+        ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
+      },
+      body: JSON.stringify({ from: `${from_name} <${from_email || process.env.RESEND_FROM_EMAIL}>`, to, subject, html, ...(replyTo ? { reply_to: replyTo } : {}) }),
+      signal: AbortSignal.timeout(15000),
     });
-
-    if (error) {
-      throw new Error(`base44 SendEmail failed: ${error.message}`);
-    }
-
-    return { id: data?.id ?? "" };
+    if (!result.ok) throw new Error("Email provider did not accept the message");
+    const data = await result.json() as { id?: string };
+    if (!data.id) throw new Error("Email provider did not return a message ID");
+    return { id: data.id };
   },
 };
-
 export default Core;

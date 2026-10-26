@@ -1,3 +1,4 @@
+import { roomRates } from "./room-rates";
 import type { RoomCategory } from "@/types";
 import { hotelPhotos } from "@/data/photos";
 
@@ -17,7 +18,7 @@ export const roomsFallback: RoomCategory[] = [
     slug: "classic-room",
     description:
       "A comfortable room with a kitchenette, a work desk and space to relax. A good choice for a short visit or a longer stay.",
-    price_per_night: 25000,
+    price_per_night: roomRates["room-classic-studio"].price,
     max_guests: 2,
     size_sqm: 24,
     amenities: [
@@ -37,7 +38,7 @@ export const roomsFallback: RoomCategory[] = [
     slug: "deluxe-room",
     description:
       "A spacious room with a kitchenette and private bathroom. Suitable for business trips and holidays.",
-    price_per_night: 35000,
+    price_per_night: roomRates["room-luxury"].price,
     max_guests: 2,
     size_sqm: 30,
     amenities: [
@@ -58,7 +59,7 @@ export const roomsFallback: RoomCategory[] = [
     slug: "executive-suite",
     description:
       "A spacious suite with a full kitchen and a separate living area. There is room to work, relax or spend time with visitors.",
-    price_per_night: 45000,
+    price_per_night: roomRates["room-classic-suite"].price,
     max_guests: 2,
     size_sqm: 52,
     amenities: [
@@ -79,7 +80,7 @@ export const roomsFallback: RoomCategory[] = [
     slug: "family-room",
     description:
       "A bedroom, living area and full kitchen give your family space to spend time together.",
-    price_per_night: 55000,
+    price_per_night: roomRates["room-presidential-suite-2-bed"].price,
     max_guests: 4,
     size_sqm: 100,
     amenities: [

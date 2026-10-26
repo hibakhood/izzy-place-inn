@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import type { GalleryImage } from "@/types";
@@ -39,8 +39,8 @@ export default function GalleryLightbox({ images, columns = 3 }: GalleryLightbox
   return (
     <>
       <div
-        className="grid gap-4"
-        style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+        className="responsive-gallery grid gap-4"
+        style={{ "--gallery-columns": columns } as CSSProperties}
       >
         {images.map((img, i) => (
           <button

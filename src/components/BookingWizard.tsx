@@ -55,6 +55,7 @@ interface BookingWizardProps {
   setAddOns: (a: Record<string, number>) => void;
   totals: BookingTotals;
   submitting: boolean;
+  securityReady: boolean;
   error: string | null;
   bookingReference: string;
   onSubmit: () => void;
@@ -81,14 +82,14 @@ function QtyStepper({
   max?: number;
 }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3">
       <span className="text-sm text-muted-foreground">{label}</span>
       <div className="flex items-center rounded-md border border-border bg-card">
         <button
           type="button"
           onClick={() => onChange(Math.max(min, value - 1))}
           aria-label={`Decrease ${label}`}
-          className="flex h-9 w-9 items-center justify-center text-ink transition-colors hover:bg-secondary disabled:opacity-40"
+          className="flex h-11 w-11 items-center justify-center text-ink transition-colors hover:bg-secondary disabled:opacity-40"
           disabled={value <= min}
         >
           <Minus className="h-4 w-4" />
@@ -98,7 +99,7 @@ function QtyStepper({
           type="button"
           onClick={() => onChange(Math.min(max, value + 1))}
           aria-label={`Increase ${label}`}
-          className="flex h-9 w-9 items-center justify-center text-ink transition-colors hover:bg-secondary disabled:opacity-40"
+          className="flex h-11 w-11 items-center justify-center text-ink transition-colors hover:bg-secondary disabled:opacity-40"
           disabled={value >= max}
         >
           <Plus className="h-4 w-4" />
@@ -153,7 +154,7 @@ export default function BookingWizard(props: BookingWizardProps) {
     step, setStep, checkIn, checkOut, setCheckIn, setCheckOut,
     guests, setGuests, numRooms, setNumRooms,
     guestInfo, setGuestInfo, addOns, setAddOns,
-    totals, submitting, error, bookingReference, onSubmit, onReset,
+    totals, submitting, securityReady, error, bookingReference, onSubmit, onReset,
   } = props;
 
   const emailValid = useMemo(
@@ -175,6 +176,7 @@ export default function BookingWizard(props: BookingWizardProps) {
 
   return (
     <div>
+      {error && <p role="alert" className="mb-6 rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</p>}
       {/* Room selection (step 0) */}
       <div className="mb-8">
         <p className="mb-3 text-sm font-medium text-ink">
@@ -251,7 +253,7 @@ export default function BookingWizard(props: BookingWizardProps) {
             <p className="mt-1 text-sm text-muted-foreground">
               Pick your check-in and check-out dates.
             </p>
-            <div className="mt-5 rounded-lg border border-border/70 bg-card p-4">
+            <div className="mt-5 rounded-lg border border-border/70 bg-card p-2 sm:p-4">
               <Calendar
                 mode="range"
                 selected={{ from: checkIn, to: checkOut }}
@@ -347,9 +349,8 @@ export default function BookingWizard(props: BookingWizardProps) {
             </div>
           </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <Button variant="outline" onClick={() => setStep(1)}>
               <ArrowLeft className="mr-1 h-4 w-4" /> Back
             </Button>
@@ -382,15 +383,15 @@ export default function BookingWizard(props: BookingWizardProps) {
             ))}
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <Button variant="outline" onClick={() => setStep(2)}>
               <ArrowLeft className="mr-1 h-4 w-4" /> Back
             </Button>
             <Button
               size="lg"
               onClick={onSubmit}
-              disabled={submitting}
-              className="min-w-44"
+              disabled={submitting || !securityReady}
+              className="min-w-0 w-full whitespace-normal px-4 sm:w-auto sm:min-w-44"
             >
               {submitting ? (
                 <>
@@ -398,7 +399,7 @@ export default function BookingWizard(props: BookingWizardProps) {
                 </>
               ) : (
                 <>
-                  Confirm Booking · {formatNaira(totals.total)}
+                  Send booking request · {formatNaira(totals.total)}
                 </>
               )}
             </Button>
@@ -408,13 +409,13 @@ export default function BookingWizard(props: BookingWizardProps) {
 
       {/* STEP 4. Confirmation */}
       {finalStep && (
-        <div className="mx-auto max-w-xl rounded-lg border border-border/70 bg-card p-8 text-center sm:p-10">
+        <div className="mx-auto max-w-xl rounded-lg border border-border/70 bg-card p-5 text-center [overflow-wrap:anywhere] sm:p-10">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
             <CheckCircle2 className="h-9 w-9 text-success" />
           </div>
-          <h3 className="mt-6 font-display text-2xl font-semibold text-ink">You're all set!</h3>
+          <h3 className="mt-6 font-display text-2xl font-semibold text-ink">Request received</h3>
           <p className="mt-2 text-muted-foreground">
-            Your booking is confirmed. We have sent a confirmation to{" "}
+            Your request has been sent to the hotel. We have emailed a copy to{" "}
             <strong className="text-ink">{guestInfo.email}</strong>.
           </p>
 
@@ -432,13 +433,13 @@ export default function BookingWizard(props: BookingWizardProps) {
           </div>
 
           <div className="mt-6 flex items-center justify-between rounded-md border border-border/70 px-5 py-3 text-sm">
-            <span className="text-muted-foreground">Total due</span>
+            <span className="text-muted-foreground">Estimated room total</span>
             <span className="font-display text-xl font-semibold text-primary">
               {formatNaira(totals.total)}
             </span>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
-            Our reception will call you shortly to arrange payment and confirm details. For urgent help, call us any hour.
+            Our reception will call you shortly to arrange payment and confirm availability. For urgent help, call us any hour.
           </p>
 
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
@@ -447,7 +448,7 @@ export default function BookingWizard(props: BookingWizardProps) {
             </Button>
             <Button onClick={onReset}>Make Another Booking</Button>
             <Button onClick={() => window.print()}>
-              <Printer className="mr-1.5 h-4 w-4" /> Print Confirmation
+              <Printer className="mr-1.5 h-4 w-4" /> Print Request
             </Button>
           </div>
         </div>

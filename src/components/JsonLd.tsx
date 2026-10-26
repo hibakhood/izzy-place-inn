@@ -10,7 +10,7 @@ export default function JsonLd({ data }: JsonLdProps) {
     <Helmet>
       {payload.map((item, i) => (
         <script key={i} type="application/ld+json">
-          {JSON.stringify(item)}
+          {JSON.stringify(item).replace(/</g, "\\u003c")}
         </script>
       ))}
     </Helmet>

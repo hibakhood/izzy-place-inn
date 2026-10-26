@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { navLinks, siteConfig } from "@/lib/site";
+import { InstallAppButton } from "./PWAInstallPrompt";
 import Logo from "./Logo";
 
 export default function Footer() {
@@ -29,7 +30,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     to={link.href}
-                    className="text-muted-foreground transition-colors hover:text-gold-deep"
+                    className="inline-flex min-h-11 items-center text-muted-foreground transition-colors hover:text-gold-deep"
                   >
                     {link.label}
                   </Link>
@@ -74,7 +75,7 @@ export default function Footer() {
                   <a
                     key={email}
                     href={`mailto:${email}`}
-                    className="flex items-center gap-3 transition-colors hover:text-gold-deep"
+                    className="flex items-center gap-3 [overflow-wrap:anywhere] transition-colors hover:text-gold-deep"
                   >
                     <Mail className="h-4 w-4 shrink-0 text-brass-400/80" />
                     {email}
@@ -95,6 +96,7 @@ export default function Footer() {
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Our reception is open day and night. Call us if you need help with your arrival.
             </p>
+            <InstallAppButton />
           </div>
         </div>
       </div>
@@ -104,6 +106,7 @@ export default function Footer() {
           <p>
             © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
           </p>
+          <Link to="/privacy" className="transition-colors hover:text-gold-deep">Privacy</Link>
           <p className="flex items-center gap-2">
             <span className="h-1 w-1 rounded-full bg-brass-400" />
             Made with pride in Ibadan, Nigeria.

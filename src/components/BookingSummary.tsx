@@ -27,11 +27,11 @@ function AddOnLine({ id, qty }: { id: string; qty: number }) {
   const svc = addOnServices.find((s) => s.id === id) as AddOnService | undefined;
   if (!svc || qty <= 0) return null;
   return (
-    <div className="flex items-center justify-between py-1.5 text-sm">
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1.5 text-sm">
       <span className="text-muted-foreground">
         {svc.name} <span className="text-xs text-muted-foreground/70">× {qty}</span>
       </span>
-      <span className="font-medium">{svc.price === null ? "Rate varies" : formatNaira(svc.price * qty)}</span>
+      <span className="font-medium text-right">{svc.price === null ? "Rate varies" : formatNaira(svc.price * qty)}</span>
     </div>
   );
 }
@@ -50,7 +50,7 @@ export default function BookingSummary({
   const hasDates = Boolean(checkIn && checkOut);
 
   return (
-    <aside className={cn("rounded-lg border border-border/70 bg-card p-6 shadow-sm", className)}>
+    <aside className={cn("min-w-0 rounded-lg border border-border/70 bg-card p-4 sm:p-6 shadow-sm", className)}>
       <h2 className="font-display text-lg font-semibold text-ink">Booking summary</h2>
 
       {!hasResource ? (
@@ -71,7 +71,7 @@ export default function BookingSummary({
 
           <dl className="mt-4 space-y-3 text-sm">
             {hasDates && (
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                 <dt className="flex items-center gap-2 text-muted-foreground">
                   <CalendarDays className="h-4 w-4" />
                   Dates
@@ -85,27 +85,27 @@ export default function BookingSummary({
               </div>
             )}
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
               <dt className="flex items-center gap-2 text-muted-foreground">
                 <Users className="h-4 w-4" /> Guests
               </dt>
-              <dd className="font-medium">{guests}</dd>
+              <dd className="font-medium text-right">{guests}</dd>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
               <dt className="flex items-center gap-2 text-muted-foreground">
                 <BedDouble className="h-4 w-4" /> Rooms
               </dt>
-              <dd className="font-medium">{numRooms}</dd>
+              <dd className="font-medium text-right">{numRooms}</dd>
             </div>
           </dl>
 
           <div className="mt-4 border-t border-border/70 pt-3">
-            <div className="flex items-center justify-between py-1 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1 text-sm">
               <span className="text-muted-foreground">
                 {resource!.name} · {numRooms} × {formatNaira(resource!.price_per_night)}
               </span>
-              <span className="font-medium">{formatNaira(totals.subtotal)}</span>
+              <span className="font-medium text-right">{formatNaira(totals.subtotal)}</span>
             </div>
 
             {Object.entries(addOns)
@@ -115,14 +115,14 @@ export default function BookingSummary({
               ))}
 
             {Object.values(addOns).some((q) => q > 0) && (
-              <div className="flex items-center justify-between py-1.5 text-sm">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1.5 text-sm">
                 <span className="text-muted-foreground">Add-on rates</span>
-                <span className="font-medium">Confirmed by management</span>
+                <span className="font-medium text-right">Confirmed by management</span>
               </div>
             )}
           </div>
 
-          <div className="mt-2 flex items-center justify-between border-t border-border/70 pt-3">
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-border/70 pt-3">
             <span className="font-semibold text-ink">Room total</span>
             <span className="font-display text-2xl font-semibold text-primary">
               {formatNaira(totals.total)}

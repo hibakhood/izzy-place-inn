@@ -91,10 +91,7 @@ create policy "Catalog is public read"
 create policy "Availability public read"
   on public.availability for select using (true);
 
--- Anyone can create a booking (the public booking form).
-create policy "Anyone can create a booking"
-  on public.bookings for insert with check (true);
-
+-- Bookings are created only by the server via security-hardening.sql.
 -- Only the owner (guest) can read/update their own booking by reference.
 create policy "Owner can read own booking"
   on public.bookings for select using (
@@ -104,10 +101,5 @@ create policy "Owner can read own booking"
     )
   );
 
-create policy "Owner can update own booking"
-  on public.bookings for update using (
-    guest_email = auth.jwt() ->> 'email'
-    or exists (
-      select 1 from pg_catalog.pg_roles where rolname = current_user and rolsuper
-    )
-  );
+-- Guests cannot update payment, pricing or status fields.
+revoke insert, update, delete on public.bookings from anon, authenticated;

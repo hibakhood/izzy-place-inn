@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -17,6 +18,10 @@ export default function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   const onHome = location.pathname === "/";
   const transparent = onHome && !scrolled;
@@ -49,7 +54,7 @@ export default function Header() {
           <Logo light={transparent} />
         </Link>
 
-        <nav className="hidden items-center gap-10 lg:flex" aria-label="Main">
+        <nav className="hidden items-center gap-5 xl:gap-10 lg:flex" aria-label="Main">
           {navLinks.map((link) =>
             link.children ? (
               <div key={link.href} className="group relative">
@@ -94,7 +99,7 @@ export default function Header() {
             <Link to="/booking">Book Now</Link>
           </Button>
 
-          <Sheet>
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
               <Button
                 variant={transparent ? "ghost" : "outline"}
@@ -105,7 +110,7 @@ export default function Header() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="flex w-80 flex-col border-l border-line bg-ivory">
+            <SheetContent side="right" className="flex w-80 max-w-full flex-col overflow-y-auto border-l border-line bg-ivory">
               <SheetHeader className="border-b border-line pb-5">
                 <SheetTitle className="text-left">
                   <Logo />

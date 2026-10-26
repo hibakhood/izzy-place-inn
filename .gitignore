@@ -33,3 +33,6 @@ skills-lock.json
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Generated service worker preview
+dev-dist/

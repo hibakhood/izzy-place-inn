@@ -79,7 +79,7 @@ export default function BookingConfirmationPrint({
             </div>
           </div>
           <div className="text-right">
-            <p className="font-display text-2xl font-bold text-ink">Booking Confirmation</p>
+            <p className="font-display text-2xl font-bold text-ink">Booking Request</p>
             <p className="mt-1 text-sm font-semibold tracking-[0.2em] text-ink">{bookingReference}</p>
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function BookingConfirmationPrint({
 
       <div className="mt-10 border-t border-line pt-5 text-xs leading-relaxed text-ink">
         <p>
-          Your booking is confirmed and held at {siteConfig.name}. Payment of{" "}
+          Your request has been received and held at {siteConfig.name}. Payment of{" "}
           {formatNaira(totals.total)} is due by arrangement with our reservations team. For changes or
           help, call {siteConfig.phones[0]} or email {siteConfig.emails.reservations}. Our reception is
           open 24 hours, every day.

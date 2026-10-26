@@ -1,3 +1,4 @@
+import SecurityCheck from "@/components/SecurityCheck";
 import { useState } from "react";
 import { Phone, Mail, MapPin, Clock, Send, Loader2, CheckCircle2 } from "lucide-react";
 import Seo from "@/components/Seo";
@@ -60,18 +61,21 @@ export default function Contact() {
     subject: ENQUIRY_TYPES[0],
     message: "",
   });
+  const [botToken, setBotToken] = useState("");
+  const [securityAttempt, setSecurityAttempt] = useState(0);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!botToken) return;
     setStatus("sending");
     setError("");
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({...form,bot_token:botToken}),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) {
@@ -82,6 +86,7 @@ export default function Contact() {
       setStatus("error");
       setError(err instanceof Error ? err.message : "Could not send your message.");
     }
+    finally {setBotToken("");setSecurityAttempt(n=>n+1);}
   };
 
   return (
@@ -111,7 +116,7 @@ export default function Contact() {
                 </div>
                 <h3 className="mt-4 font-semibold text-ink">{c.title}</h3>
                 {c.lines.map((l) => (
-                  <p key={l} className="mt-1 text-sm text-ink">
+                  <p key={l} className="mt-1 break-words text-sm text-ink">
                     {l}
                   </p>
                 ))}
@@ -164,6 +169,7 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                <SecurityCheck key={securityAttempt} action="contact" onVerify={setBotToken} />
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="contact-name">Full name</Label>
@@ -229,7 +235,7 @@ export default function Contact() {
 
                 {error && <p className="text-sm text-destructive">{error}</p>}
 
-                <Button type="submit" size="lg" disabled={status === "sending"} className="min-w-44">
+                <Button type="submit" size="lg" disabled={status === "sending" || !botToken} className="min-w-44">
                   {status === "sending" ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" /> Sending...

@@ -1,60 +1,26 @@
-import { Core } from "../lib/base44/integrations/core";
-import { siteConfig } from "../src/lib/site";
+import { verifyBotCheck } from "../lib/server/bot-check";
+import { createHash } from "node:crypto";
+import { Core, requireEmailConfiguration } from "../lib/base44/integrations/core";
+import { email, failure, jsonBody, rateLimit, response, text, HttpError } from "../lib/server/http";
+import { escapeHtml } from "../lib/server/html";
+import { hotelRecipients } from "../lib/server/notifications";
 
-interface ContactBody {
-  name: string;
-  email: string;
-  phone?: string;
-  subject?: string;
-  message: string;
-}
-
-/**
- * POST /api/contact
- * Sends a contact-form enquiry to the hotel inbox.
- */
-export default async function handler(req: Request): Promise<Response> {
-  if (req.method !== "POST") {
-    return Response.json({ error: "Method not allowed" }, { status: 405 });
-  }
-
+export async function POST(req: Request): Promise<Response> {
+  if (req.method !== "POST") return response({ error: "Method not allowed" },405);
   try {
-    const body = (await req.json()) as ContactBody;
-
-    if (!body.name || !body.email || !body.message) {
-      return Response.json({ error: "Name, email and message are required" }, { status: 400 });
-    }
-
-    const html = `
-      <div style="font-family:Arial,sans-serif;color:#15271C;max-width:600px;margin:0 auto;">
-        <div style="background:#0C3B24;padding:20px;border-radius:10px 10px 0 0;">
-          <h1 style="margin:0;color:#FAF6EF;font-size:18px;">New Contact Enquiry</h1>
-        </div>
-        <div style="background:#fff;padding:20px;border:1px solid #eee;border-top:none;border-radius:0 0 10px 10px;">
-          <p><strong>From:</strong> ${body.name} (${body.email})${body.phone ? ` · ${body.phone}` : ""}</p>
-          ${body.subject ? `<p><strong>Subject:</strong> ${body.subject}</p>` : ""}
-          <hr style="border:none;border-top:1px solid #eee;margin:16px 0;" />
-          <p style="white-space:pre-wrap;">${body.message}</p>
-        </div>
-      </div>`;
-
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const recipients = [siteConfig.emails.info];
-    if (adminEmail) recipients.push(adminEmail);
-
-    const result = await Core.SendEmail({
-      to: recipients,
-      subject: `Website enquiry — ${body.subject || body.name}`,
-      html,
-      from_name: "Izzy Place Inn & Suites",
-    });
-
-    return Response.json({ ok: true, id: result.id });
-  } catch (error) {
-    console.error("[contact]", error);
-    return Response.json(
-      { ok: false, error: error instanceof Error ? error.message : "Send failed" },
-      { status: 500 }
-    );
-  }
+    const body = await jsonBody(req);
+    const name = text(body.name,"your name",120);
+    const sender = email(body.email);
+    const phone = text(body.phone,"your phone number",40,true);
+    const subject = text(body.subject,"the subject",120,true).replace(/[\r\n]/g," ");
+    const message = text(body.message,"your message",4000);
+    if (body.website) throw new HttpError(400,"Please check your message.");
+    requireEmailConfiguration();
+    await rateLimit(req,"contact");
+    await verifyBotCheck(body.bot_token,"contact");
+    const fingerprint = createHash("sha256").update(JSON.stringify([name,sender,phone,subject,message,Math.floor(Date.now()/3600000)])).digest("hex");
+    const html = `<h1>New website enquiry</h1><p>From: ${escapeHtml(name)} (${escapeHtml(sender)})</p><p>Phone: ${escapeHtml(phone)}</p><p>Subject: ${escapeHtml(subject)}</p><p style="white-space:pre-wrap">${escapeHtml(message)}</p>`;
+    await Core.SendEmail({ to: hotelRecipients(), subject: `Website enquiry: ${subject || "New message"}`, html, replyTo: sender, idempotencyKey: `contact/${fingerprint}` });
+    return response({ ok: true });
+  } catch(error) { return failure(error); }
 }

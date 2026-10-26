@@ -1,5 +1,6 @@
 import { siteConfig } from "../src/lib/site";
-import { formatNaira, formatDate, formatDateShort } from "../src/lib/utils";
+import { formatNaira, formatDate, formatDateShort } from "./format";
+import { escapeHtml } from "./server/html";
 
 export interface EmailResource {
   name: string;
@@ -35,7 +36,8 @@ export interface EmailBooking {
 
 const hotelLine = `${siteConfig.name} · ${siteConfig.address.line1}, ${siteConfig.address.line2}, ${siteConfig.address.city}, ${siteConfig.address.state}, ${siteConfig.address.country}`;
 
-export function buildGuestEmail(b: EmailBooking): string {
+export function buildGuestEmail(input: EmailBooking): string {
+  const b = safeEmail(input);
   const dateRange = `${formatDate(b.check_in_date)} to ${formatDate(b.check_out_date)}`;
 
   const addOnRows =
@@ -55,11 +57,11 @@ export function buildGuestEmail(b: EmailBooking): string {
   <div style="font-family:Arial,Helvetica,sans-serif;color:#15271C;max-width:600px;margin:0 auto;">
     <div style="background:#0C3B24;padding:28px;border-radius:10px 10px 0 0;">
       <p style="margin:0;color:#B98A3F;font-size:12px;letter-spacing:2px;text-transform:uppercase;">Izzy Place Inn &amp; Suites</p>
-      <h1 style="margin:8px 0 0;color:#FAF6EF;font-size:24px;">Booking Confirmed</h1>
+      <h1 style="margin:8px 0 0;color:#FAF6EF;font-size:24px;">Booking Request Received</h1>
     </div>
     <div style="background:#ffffff;padding:28px;border:1px solid #eee;border-top:none;border-radius:0 0 10px 10px;">
       <p>Dear <strong>${b.guest_name}</strong>,</p>
-      <p>Thank you for choosing ${siteConfig.name}. Your booking is confirmed and our 24-hour reception is ready for you.</p>
+      <p>Thank you for choosing ${siteConfig.name}. We have received your booking request. Our reception team will confirm room availability and payment details with you. Your room is not reserved until the hotel confirms.</p>
 
       <div style="background:#FAF6EF;border:1px solid #E7DED0;border-radius:8px;padding:18px;margin:20px 0;">
         <p style="margin:0 0 10px;font-size:13px;color:#666;">BOOKING REFERENCE</p>
@@ -95,7 +97,8 @@ export function buildGuestEmail(b: EmailBooking): string {
   </div>`;
 }
 
-export function buildAdminEmail(b: EmailBooking): string {
+export function buildAdminEmail(input: EmailBooking): string {
+  const b = safeEmail(input);
   const dateRange = `${formatDateShort(b.check_in_date)} to ${formatDateShort(b.check_out_date)}`;
 
   const addOnRows =
@@ -116,7 +119,7 @@ export function buildAdminEmail(b: EmailBooking): string {
   <div style="font-family:Arial,Helvetica,sans-serif;color:#15271C;max-width:640px;margin:0 auto;">
     <div style="background:#0C3B24;padding:24px;border-radius:10px 10px 0 0;">
       <h1 style="margin:0;color:#FAF6EF;font-size:20px;">New Booking. ${b.booking_reference}</h1>
-      <p style="margin:6px 0 0;color:#B98A3F;font-size:13px;">${siteConfig.shortName} · ${new Date().toLocaleString("en-NG")}</p>
+      <p style="margin:6px 0 0;color:#B98A3F;font-size:13px;">${siteConfig.shortName} · New reservation</p>
     </div>
     <div style="background:#ffffff;padding:24px;border:1px solid #eee;border-top:none;border-radius:0 0 10px 10px;">
       <table style="width:100%;border-collapse:collapse;font-size:14px;">
@@ -149,4 +152,15 @@ export function buildAdminEmail(b: EmailBooking): string {
       </table>
     </div>
   </div>`;
+}
+
+function safeEmail(b: EmailBooking): EmailBooking {
+  return { ...b,
+    booking_reference: escapeHtml(b.booking_reference),
+    guest_name: escapeHtml(b.guest_name), guest_email: escapeHtml(b.guest_email), guest_phone: escapeHtml(b.guest_phone),
+    special_requests: escapeHtml(b.special_requests || ""),
+    booking_status: escapeHtml(b.booking_status), payment_status: escapeHtml(b.payment_status),
+    resource: { ...b.resource, name: escapeHtml(b.resource.name) },
+    add_ons: b.add_ons.map(a => ({ ...a, name: escapeHtml(a.name) })),
+  };
 }

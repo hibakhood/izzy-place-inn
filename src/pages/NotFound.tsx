@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export default function NotFound() {
   return (
     <>
-      <Seo title="Page Not Found" description="The page you are looking for could not be found." path="/404" />
+      <Seo title="Page Not Found" description="The page you are looking for could not be found." path="/404" noindex />
 
       <section className="flex min-h-[70vh] items-center justify-center bg-cream-100 px-4">
         <div className="text-center">

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /booking
+Disallow: /api/
+
+Sitemap: https://izzyplaceinn.com/sitemap.xml

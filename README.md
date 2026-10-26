@@ -1,61 +1,33 @@
 # Izzy Place Inn & Suites
 
-Official website for Izzy Place Inn & Suites, Ibadan — a full-service hotel and
-suites on Old Ife Road. Rooms and suites, add-on services, and an online
-booking flow.
+React/Vite hotel website and installable PWA. The application uses a local room catalog and **no database**. Booking requests and contact messages are emailed through a server API.
 
-## Stack
+## Run and build
 
-- **Frontend**: React 18 + Vite 5 + TypeScript, React Router v6, Tailwind CSS v3, shadcn/ui-style components, framer-motion, react-helmet-async (SEO), react-day-picker (date selection)
-- **Backend**: Supabase (Postgres + RLS) for catalog + bookings; Vercel serverless functions (`/api`) for transactional email via Resend
-- **Deployment**: Vercel (SPA rewrites in `vercel.json`)
+- `npm install`
+- `npm run dev` starts Vite and the local email API (port 3001).
+- `npm test` runs security and install-policy tests.
+- `npm run build` checks types, builds the PWA and prerenders public pages.
+- `npm run preview` serves the production build locally. Native installation should be tested on this build or the HTTPS deployment; the development server intentionally does not register a service worker.
 
-## Getting started
+The local base path is `/izzy-place-inn/`; Vercel builds use `/`. Both manifest and service worker respect the application path. Existing Supabase SQL files are historical and are not part of this setup. No database credentials or migration is required.
 
-```bash
-npm install
-npm run dev       # local dev server
-npm run build     # typecheck + production build
-```
+## Secure email setup
 
-Create `.env.local` from `.env.example` and add your Supabase and Resend keys.
-Without keys the site runs in **fallback mode**: catalog is served from `src/data/*`
-and bookings confirm without persisting to a database.
+Use `.env.example` as the configuration guide. Set server secrets in your hosting environment or an ignored local `.env.local`, never in source control or `VITE_` variables. `RESEND_FROM_EMAIL` must be a verified sender. Notifications go to **izzyplaceinn@gmail.com** and **info@izzyplaceinn.com**, plus optional ADMIN_EMAIL recipients. Do not paste secrets into chat.
 
-## Project structure
+Create a Cloudflare Turnstile widget restricted to your website hostname. Set its public `VITE_TURNSTILE_SITE_KEY` and server-only `TURNSTILE_SECRET_KEY`. Set `SITE_ORIGIN` to the exact deployed origin (or your local origin for local verification). Server verification checks success, hostname and the booking/contact action. Missing email or bot configuration fails closed and gives guests the reception phone option.
 
-```
-src/
-  components/       UI + page components (BookingSummary, BookingWizard, ...)
-  pages/            Route-level pages (Home, Rooms, Booking, Gallery, Contact, ...)
-  data/             Fallback catalog (rooms, add-ons, content)
-  hooks/            Data-loading hooks (useRooms)
-  lib/              utils, site config, supabase client, booking/email helpers
-api/                Vercel serverless functions (send-booking-emails, contact)
-lib/base44/         base44.integrations.Core email integration (Resend)
-supabase/           schema.sql + seed.sql
-```
+Set independent long random `BOOKING_REFERENCE_SECRET` and `RATE_LIMIT_SECRET` values. A bounded, hashed-IP per-process throttle supplements Turnstile; it is not a global limit across serverless instances. Configure hosting firewall limits and email-provider spend/usage alerts for additional protection. Origin checks, body limits, schema validation, HTML escaping and fixed hotel recipients remain enforced. The retired queue worker returns 410 and cannot send email.
 
-## Booking flow
+## Booking behavior without a database
 
-1. Choose a **room or suite** (`/#/booking?slug=deluxe-room` pre-selects)
-2. Pick **dates** + number of guests/rooms
-3. Enter **guest details**
-4. Add optional **add-on services**
-5. Confirm → booking saved to Supabase `bookings`, confirmation screen shows instantly,
-   and guest + admin emails are sent in the background (`/api/send-booking-emails`)
+The server calculates room estimates from the shared catalog. Hotel notification must be accepted by the email provider before the guest receipt is attempted. Guest emails clearly say **request received**, with availability and payment to be confirmed by hotel staff. There is no automatic inventory reservation, persisted guest record or background retry queue.
 
-## Deploying
+Unchanged retries use the same reference and provider idempotency keys. The browser keeps only a digest and random request key in session storage, not guest details. Provider duplicate protection lasts 24 hours; it is not permanent storage. If one email fails, the guest sees an error and can retry with unchanged details or call reception. Check provider delivery history before a manual resend. Email acceptance is not proof of inbox delivery. Test both hotel mailboxes and the guest mailbox with production credentials before launch.
 
-- Push to GitHub and import in Vercel (framework preset: Vite).
-- Add `RESEND_API_KEY`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` to project env vars.
-- Run `supabase/schema.sql` and `supabase/seed.sql` in the Supabase SQL editor.
+## PWA installation and privacy
 
-## Content note
+The page offers installation to visitors who have not already installed it. A native prompt can only open after a user taps Install and the browser has supplied `beforeinstallprompt`. Browser rules, prior dismissal, private mode and embedded browsers may prevent that event. Manual instructions remain available through Install app. On iPhone/iPad, use the browser Share menu and Add to Home Screen. Installed apps do not show the promotion. Dismissal is respected for the session.
 
-Brand, positioning and amenity copy was written for Izzy Place Inn & Suites, and all
-photography is staged in `public/images/`. Room **prices, size estimates and the add-on
-catalogue are reasonable estimates** pending final figures from the hotel — they live in
-`src/data/*` (and `supabase/seed.sql`) and are easy to swap for the real numbers.
-Room-category counts total 25 and are approximate. Testimonials are illustrative
-placeholders.
+Serve production over HTTPS. PWA caching is limited to public application assets. Email API requests and guest data are not cached or queued offline; photos/video are excluded from bulk precaching. No push-notification permission, tracking SDK or personal data is needed for installation. Inspect the report-only Content Security Policy on the production host before enforcement. The hotel should confirm its email retention and privacy practices.

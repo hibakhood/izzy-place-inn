@@ -12,18 +12,6 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: "auto",
-      includeAssets: [
-        "favicon.ico",
-        "izzy-icon-16.png",
-        "izzy-icon-32.png",
-        "izzy-icon-48.png",
-        "izzy-icon-180.png",
-        "izzy-icon-192.png",
-        "izzy-icon-512.png",
-        "apple-touch-icon.png",
-        "images/brand/izzy-logo-forest-gold.png",
-        "images/facilities/outdoor-image.jpg",
-      ],
       manifest: false,
       includeAssets: [
         "favicon.ico",
@@ -36,13 +24,14 @@ export default defineConfig({
         "apple-touch-icon.png",
         "site.webmanifest",
         "images/brand/izzy-logo-forest-gold.png",
-        "images/facilities/outdoor-image.jpg",
       ],
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,jpg,jpeg,svg,webp,woff2,mp4,json}"],
+        globPatterns: ["**/*.{js,css,html,woff2}"],
+        globIgnores: ["**/images/**", "**/videos/**"],
+        cleanupOutdatedCaches: true,
         navigateFallback: "index.html",
         navigateFallbackDenylist: [/^\/api\//],
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+        maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -68,13 +57,19 @@ export default defineConfig({
         ],
       },
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
     }),
   ],
+  server: {
+    host: "127.0.0.1",
+    proxy: {
+      "/api": "http://127.0.0.1:3001",
+    },
+  },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
 });

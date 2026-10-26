@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.js";
 
 @layer base {
   :root {
@@ -150,3 +149,13 @@ body.lightbox-open {
   background: linear-gradient(180deg, rgb(20 26 21 / 0.88), rgb(20 26 21 / 0.25) 48%, rgb(20 26 21 / 0.88));
 }
 .hero-copy { text-shadow: 0 2px 12px rgb(0 0 0 / 0.35); }
+
+/* Keep gallery photographs useful on phones, with the full grid on larger screens. */
+.responsive-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 768px) {
+  .responsive-gallery { grid-template-columns: repeat(var(--gallery-columns, 3), minmax(0, 1fr)); }
+}
+@media (max-width: 639px) {
+  /* Prevent iOS from zooming into form controls and obscuring nearby actions. */
+  input:not([type="checkbox"]):not([type="radio"]), textarea, select { font-size: 16px; }
+}

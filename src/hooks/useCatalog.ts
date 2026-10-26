@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { getRooms } from "@/lib/data";
+import { roomsFallback } from "@/data/rooms";
 import type { RoomCategory } from "@/types";
 
 export function useRooms() {
-  const [rooms, setRooms] = useState<RoomCategory[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [rooms, setRooms] = useState<RoomCategory[] | null>(roomsFallback);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let active = true;

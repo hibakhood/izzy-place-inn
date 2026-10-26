@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import SecurityCheck from "@/components/SecurityCheck";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Seo from "@/components/Seo";
 import BookingSummary, { type BookingTotals } from "@/components/BookingSummary";
@@ -6,16 +7,15 @@ import BookingWizard from "@/components/BookingWizard";
 import BookingConfirmationPrint from "@/components/BookingConfirmationPrint";
 import { useRooms } from "@/hooks/useCatalog";
 import { canonicalRoomSlug } from "@/lib/data";
-import { saveBooking, sendBookingEmails } from "@/lib/booking";
+import { saveBooking, type BookingRequest } from "@/lib/booking";
 import { getAddOnById } from "@/data/addons";
 import {
   formatNaira,
-  generateBookingReference,
   nightsBetween,
 } from "@/lib/utils";
 import { Loader2, Phone } from "lucide-react";
 import { siteConfig } from "@/lib/site";
-import type { AddOnSelection, BookingPayload, RoomCategory } from "@/types";
+import type { RoomCategory } from "@/types";
 
 interface GuestInfo {
   name: string;
@@ -53,6 +53,10 @@ export default function Booking() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bookingReference, setBookingReference] = useState("");
+  const [botToken, setBotToken] = useState("");
+  const [securityAttempt, setSecurityAttempt] = useState(0);
+  const [confirmedTotal, setConfirmedTotal] = useState<number | null>(null);
+  const requestAttempt = useRef<{ fingerprint: string; key: string } | null>(null);
 
   const catalog = rooms;
   const loading = roomsLoading;
@@ -89,82 +93,58 @@ export default function Booking() {
   }, [resource, checkIn, checkOut, numRooms, addOns]);
 
   const handleSubmit = async () => {
-    if (!resource || !checkIn || !checkOut) return;
+    if (!resource || !checkIn || !checkOut || submitting || !botToken) return;
     setSubmitting(true);
     setError(null);
-
-    const reference = generateBookingReference();
-    const unitPrice = resource.price_per_night;
-
-    // Capture a snapshot of the resource object before any state changes.
-    const resourceSnapshot = {
-      name: resource.name,
-      price: unitPrice,
-      unit: "night",
-    };
-
-    const addOnSelections: AddOnSelection[] = Object.entries(addOns)
-      .filter(([, qty]) => qty > 0)
-      .map(([id, quantity]) => ({ id, quantity }));
-
-    const payload: BookingPayload = {
-      booking_type: "room",
+    const localDate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const payload: BookingRequest = {
       room_category_id: resource.id,
       guest_name: guestInfo.name.trim(),
       guest_email: guestInfo.email.trim(),
       guest_phone: guestInfo.phone.trim(),
-      check_in_date: checkIn.toISOString().split("T")[0],
-      check_out_date: checkOut.toISOString().split("T")[0],
+      check_in_date: localDate(checkIn),
+      check_out_date: localDate(checkOut),
       number_of_guests: guests,
       number_of_rooms: numRooms,
-      add_on_services: addOnSelections,
+      add_on_services: Object.entries(addOns).filter(([, quantity]) => quantity > 0).sort(([a], [b]) => a.localeCompare(b)).map(([id, quantity]) => ({ id, quantity })),
       special_requests: guestInfo.requests.trim() || undefined,
-      total_amount: totals.total,
-      payment_status: "pending",
-      booking_status: "confirmed",
-      booking_reference: reference,
     };
-
-    const res = await saveBooking(payload);
-    if (!res.ok) {
-      setError(`We could not save your booking just now (${res.error}). Please try again or call us.`);
+    try {
+      const fingerprint = JSON.stringify(payload);
+      if (requestAttempt.current?.fingerprint !== fingerprint) {
+        let key = crypto.randomUUID();
+        // Persist only a digest and random key, never guest details. This also
+        // protects an unchanged request retried after a page refresh.
+        try {
+          const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(fingerprint));
+          const hash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+          const previous = JSON.parse(sessionStorage.getItem("izzy-booking-attempt") || "null");
+          if (previous?.hash === hash && typeof previous.key === "string") key = previous.key;
+          sessionStorage.setItem("izzy-booking-attempt", JSON.stringify({ hash, key }));
+        } catch { /* Private browsing may disable storage; same-page retries remain protected. */ }
+        requestAttempt.current = { fingerprint, key };
+      }
+      const res = await saveBooking(payload, requestAttempt.current.key, botToken);
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
+      setBookingReference(res.booking_reference);
+      setConfirmedTotal(res.total_amount);
+      setStep(4);
+    } catch {
+      setError("We could not confirm your booking. Please retry with the same details or call reception.");
+    } finally {
       setSubmitting(false);
-      return;
+      setBotToken("");
+      setSecurityAttempt(n => n + 1);
     }
-
-    setBookingReference(reference);
-    setStep(4);
-    setSubmitting(false);
-
-    const emailAddOns = addOnSelections
-      .map((s) => {
-        const svc = getAddOnById(s.id);
-        return svc ? { name: svc.name, price: svc.price, quantity: s.quantity } : null;
-      })
-      .filter((x): x is { name: string; price: number; quantity: number } => x !== null);
-
-    sendBookingEmails({
-      booking_reference: reference,
-      booking_type: "room",
-      resource: resourceSnapshot,
-      guest_name: payload.guest_name,
-      guest_email: payload.guest_email,
-      guest_phone: payload.guest_phone,
-      check_in_date: payload.check_in_date,
-      check_out_date: payload.check_out_date,
-      number_of_guests: payload.number_of_guests,
-      number_of_rooms: payload.number_of_rooms,
-      add_ons: emailAddOns,
-      special_requests: payload.special_requests,
-      subtotal: totals.subtotal,
-      add_on_total: totals.addOnTotal,
-      total_amount: totals.total,
-      booking_status: payload.booking_status,
-      payment_status: payload.payment_status,
-    });
   };
 
   const handleReset = () => {
+    setConfirmedTotal(null);
+    requestAttempt.current = null;
+    try { sessionStorage.removeItem("izzy-booking-attempt"); } catch { /* Storage is optional. */ }
     setResource(null);
     setCheckIn(undefined);
     setCheckOut(undefined);
@@ -175,11 +155,13 @@ export default function Booking() {
     setStep(1);
   };
 
+  const displayedTotals = step !== 4 || confirmedTotal === null ? totals : { ...totals, subtotal: confirmedTotal, addOnTotal: 0, total: confirmedTotal };
+
   return (
     <>
       <Seo
         title="Book Your Stay"
-        description="Book a room or suite at Izzy Place Inn & Suites, Ibadan. Choose your dates, add extras and confirm your stay in minutes."
+        description="Book a room or suite at Izzy Place Inn & Suites, Ibadan. Choose your dates, add extras and send your booking request in minutes."
         keywords="book hotel Ibadan, book rooms and suites Ibadan, Izzy Place Inn booking"
         path="/book"
       />
@@ -188,11 +170,11 @@ export default function Booking() {
         <div className="container-site py-10 md:py-14">
           <p className="eyebrow">Reservations</p>
           <h1 className="mt-2 font-display text-3xl font-semibold text-ink md:text-4xl">
-            {step === 4 ? "Booking confirmed" : "Book your stay"}
+            {step === 4 ? "Booking request received" : "Book your stay"}
           </h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
             {step === 4
-              ? `Thank you, ${guestInfo.name.split(" ")[0]}. Your reservation is confirmed and a copy is on its way to your inbox.`
+              ? `Thank you, ${guestInfo.name.split(" ")[0]}. Your request has been sent to the hotel. Our team will confirm availability with you.`
               : "Choose your room, dates and any extras. Our team will contact you to arrange payment."}
           </p>
         </div>
@@ -204,8 +186,9 @@ export default function Booking() {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
             <div>
+              {step === 3 && <SecurityCheck key={securityAttempt} action="booking" onVerify={setBotToken} />}
               <BookingWizard
                 rooms={rooms ?? []}
                 resource={resource}
@@ -224,8 +207,9 @@ export default function Booking() {
                 setGuestInfo={setGuestInfo}
                 addOns={addOns}
                 setAddOns={setAddOns}
-                totals={totals}
+                totals={displayedTotals}
                 submitting={submitting}
+                securityReady={Boolean(botToken)}
                 error={error}
                 bookingReference={bookingReference}
                 onSubmit={handleSubmit}
@@ -241,7 +225,7 @@ export default function Booking() {
                 guests={guests}
                 numRooms={numRooms}
                 addOns={addOns}
-                totals={totals}
+                totals={displayedTotals}
                 className="sticky top-24"
               />
               <div className="mt-6 flex items-start gap-3 rounded-lg border border-border/70 bg-card p-4">
@@ -267,7 +251,7 @@ export default function Booking() {
           guests={guests}
           numRooms={numRooms}
           addOns={addOns}
-          totals={totals}
+          totals={displayedTotals}
           guestName={guestInfo.name.trim()}
           guestEmail={guestInfo.email.trim()}
           guestPhone={guestInfo.phone.trim()}

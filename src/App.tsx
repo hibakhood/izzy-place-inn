@@ -1,16 +1,19 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout";
-import Home from "@/pages/Home";
-import Rooms from "@/pages/Rooms";
-import RoomDetail from "@/pages/RoomDetail";
-import Booking from "@/pages/Booking";
-import Gallery from "@/pages/Gallery";
-import About from "@/pages/About";
-import Contact from "@/pages/Contact";
-import NotFound from "@/pages/NotFound";
+const Home = lazy(() => import("@/pages/Home"));
+const Rooms = lazy(() => import("@/pages/Rooms"));
+const RoomDetail = lazy(() => import("@/pages/RoomDetail"));
+const Booking = lazy(() => import("@/pages/Booking"));
+const Gallery = lazy(() => import("@/pages/Gallery"));
+const About = lazy(() => import("@/pages/About"));
+const Contact = lazy(() => import("@/pages/Contact"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
 
 export default function App() {
   return (
+    <Suspense fallback={<div className="flex min-h-[60vh] items-center justify-center" role="status">Loading page…</div>}>
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
@@ -20,8 +23,10 @@ export default function App() {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
+    </Suspense>
   );
 }
