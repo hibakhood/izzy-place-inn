@@ -9,18 +9,20 @@ import { cn, asset } from "@/lib/utils";
 const FILTERS = [
   { id: "all", label: "All" },
   { id: "rooms", label: "Rooms & Suites" },
+  { id: "family-room", label: "Family Room" },
+  { id: "executive-suite", label: "Executive Suite" },
   { id: "facilities", label: "Facilities" },
 ] as const;
 
 export default function Gallery() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["id"]>("all");
-  const images = filter === "all" ? galleryImages : galleryImages.filter((i) => i.category === filter);
+  const images = filter === "all" ? galleryImages : galleryImages.filter((i) => filter === "family-room" || filter === "executive-suite" ? i.id.startsWith(`${filter}-`) : i.category === filter);
 
   return (
     <>
       <Seo
         title="Gallery"
-        description="See photos of the rooms, suites, kitchens, lobby and exterior at Izzy Place Inn & Suites."
+        description="See photos of the rooms, suites, kitchens, games area, lobby and exterior at Izzy Place Inn & Suites."
         keywords="Izzy Place Inn gallery, Ibadan hotel photos, hotel rooms Ibadan, suites pictures Ibadan"
         path="/gallery"
       />
@@ -28,7 +30,7 @@ export default function Gallery() {
       <PageHero
         eyebrow="Gallery"
         title="A look inside Izzy Place"
-        description="Explore our rooms, fitted kitchens, welcoming lobby and the house itself."
+        description="Explore our rooms, fitted kitchens, games area, welcoming lobby and the house itself."
         image={asset("/images/facilities/lobby-3.jpg")}
       />
 
