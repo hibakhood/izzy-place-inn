@@ -75,13 +75,21 @@ export const coreValues = [
   },
 ];
 
+const galleryOrder = ["family-room", "executive-suite", "deluxe-room", "classic-room", "facilities"];
+
 export const galleryImages: GalleryImage[] = Object.entries(hotelPhotos).flatMap(([category, photos]) =>
   photos.map((photo, index) => ({
     id: `${category}-${index + 1}`,
     ...photo,
     category: category === "facilities" ? "facilities" as const : "rooms" as const,
   })),
-);
+).sort((a, b) => {
+  const rank = (image: GalleryImage) => {
+    if (/\/(?:\d+-)?(?:efootball|table-tennis|snooker)/.test(image.src)) return -1;
+    return galleryOrder.findIndex((group) => image.id.startsWith(`${group}-`));
+  };
+  return rank(a) - rank(b);
+});
 
 export const amenitiesList = [
   {
