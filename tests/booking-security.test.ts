@@ -108,3 +108,35 @@ test('guest email remains required for hotel booking details', () => {
   }
   assert.equal(validateBooking(input(), key).guest_email, 'ada@example.com');
 });
+
+test('booking succeeds without a security token and sends only the hotel email', async () => {
+  const { POST } = await import('../api/bookings');
+  const keys = ['RESEND_API_KEY', 'RESEND_FROM_EMAIL', 'RATE_LIMIT_SECRET', 'BOOKING_REFERENCE_SECRET', 'SITE_ORIGIN'];
+  const saved = keys.map(key => process.env[key]);
+  const originalFetch = globalThis.fetch;
+  const messages: Record<string, unknown>[] = [];
+  try {
+    Object.assign(process.env, { RESEND_API_KEY: 'test-only', RESEND_FROM_EMAIL: 'info@izzyplaceinn.com', RATE_LIMIT_SECRET: 'test-rate-limit', BOOKING_REFERENCE_SECRET: 'test-reference', SITE_ORIGIN: 'https://izzyplaceinn.com' });
+    globalThis.fetch = async (url, options) => {
+      assert.equal(url, 'https://api.resend.com/emails');
+      messages.push(JSON.parse(String(options?.body)));
+      return new Response(JSON.stringify({ id: 'mock-email-id' }), { status: 200 });
+    };
+    for (const extras of [[], [{ id: 'addon-welcome-drinks', quantity: 1 }]]) {
+      const response = await POST(new Request('https://izzyplaceinn.com/api/bookings', {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: 'https://izzyplaceinn.com', 'idempotency-key': key },
+        body: JSON.stringify({ ...input(), room_category_id: "room-classic-studio", add_on_services: extras }),
+      }));
+      assert.equal(response.status, 200);
+      assert.equal((await response.json()).ok, true);
+    }
+    assert.equal(messages.length, 2);
+    for (const message of messages) {
+      assert.deepEqual(message.to, ['info@izzyplaceinn.com']);
+      assert.ok(String(message.html).includes('ada@example.com'));
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+    keys.forEach((key, index) => { if (saved[index] === undefined) delete process.env[key]; else process.env[key] = saved[index]; });
+  }
+});

@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   CalendarDays,
@@ -56,7 +56,6 @@ interface BookingWizardProps {
   setAddOns: (a: Record<string, number>) => void;
   totals: BookingTotals;
   submitting: boolean;
-  securityCheck: ReactNode;
   error: string | null;
   bookingReference: string;
   onSubmit: () => void;
@@ -156,7 +155,7 @@ export default function BookingWizard(props: BookingWizardProps) {
     step, setStep, checkIn, checkOut, setCheckIn, setCheckOut,
     guests, setGuests, numRooms, setNumRooms,
     guestInfo, setGuestInfo, addOns, setAddOns,
-    totals, submitting, securityCheck, error, bookingReference, onSubmit, onReset, onDownload,
+    totals, submitting, error, bookingReference, onSubmit, onReset, onDownload,
   } = props;
 
   const emailValid = useMemo(
@@ -386,7 +385,6 @@ export default function BookingWizard(props: BookingWizardProps) {
             ))}
           </div>
 
-          {securityCheck}
           {error && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</p>}
 
           <div className="flex flex-wrap items-center justify-between gap-3">

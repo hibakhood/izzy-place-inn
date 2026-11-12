@@ -49,7 +49,7 @@ export function integer(value: unknown, name: string, max: number) {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > max) throw new HttpError(400, `Please check ${name}.`);
   return value;
 }
-// A bounded per-process throttle supplements mandatory bot verification. It is
+// A bounded per-process throttle limits booking and contact requests. It is
 // deliberately not described as a global/durable limit across serverless workers.
 const buckets = new Map<string, { count: number; until: number }>();
 export async function rateLimit(req: Request, action: "booking" | "contact") {

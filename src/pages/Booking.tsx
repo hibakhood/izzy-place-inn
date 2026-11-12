@@ -1,5 +1,4 @@
 import { bookingConfirmationText } from "@/lib/booking-confirmation";
-import SecurityCheck from "@/components/SecurityCheck";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Seo from "@/components/Seo";
@@ -54,8 +53,6 @@ export default function Booking() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bookingReference, setBookingReference] = useState("");
-  const [botToken, setBotToken] = useState("");
-  const [securityAttempt, setSecurityAttempt] = useState(0);
   const [confirmedTotal, setConfirmedTotal] = useState<number | null>(null);
   const requestAttempt = useRef<{ fingerprint: string; key: string } | null>(null);
 
@@ -95,10 +92,6 @@ export default function Booking() {
 
   const handleSubmit = async () => {
     if (!resource || !checkIn || !checkOut || submitting) return;
-    if (!botToken) {
-      setError("Please complete the security check above the Send booking button. If it does not load, please call reception for help.");
-      return;
-    }
     setSubmitting(true);
     setError(null);
     const localDate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -129,7 +122,7 @@ export default function Booking() {
         } catch { /* Private browsing may disable storage; same-page retries remain protected. */ }
         requestAttempt.current = { fingerprint, key };
       }
-      const res = await saveBooking(payload, requestAttempt.current.key, botToken);
+      const res = await saveBooking(payload, requestAttempt.current.key);
       if (!res.ok) {
         setError(res.error);
         return;
@@ -141,8 +134,6 @@ export default function Booking() {
       setError("We could not confirm your booking. Please retry with the same details or call reception.");
     } finally {
       setSubmitting(false);
-      setBotToken("");
-      setSecurityAttempt(n => n + 1);
     }
   };
 
@@ -243,7 +234,6 @@ export default function Booking() {
                 setAddOns={setAddOns}
                 totals={displayedTotals}
                 submitting={submitting}
-                securityCheck={<SecurityCheck key={securityAttempt} action="booking" onVerify={setBotToken} />}
                 error={error}
                 bookingReference={bookingReference}
                 onSubmit={handleSubmit}

@@ -41,12 +41,12 @@ export type BookingResult =
   | { ok: true; booking_reference: string; total_amount: number }
   | { ok: false; error: string };
 
-export async function saveBooking(payload: BookingRequest, requestKey: string, botToken: string): Promise<BookingResult> {
+export async function saveBooking(payload: BookingRequest, requestKey: string): Promise<BookingResult> {
   try {
     const result = await fetch("/api/bookings", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Idempotency-Key": requestKey },
-      body: JSON.stringify({ ...payload, bot_token: botToken }),
+      body: JSON.stringify(payload),
     });
     const data = await result.json().catch(() => null);
     if (!result.ok) {
