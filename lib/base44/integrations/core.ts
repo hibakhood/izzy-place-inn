@@ -1,4 +1,4 @@
-import { HttpError } from "../../server/http";
+import { HttpError } from "../../server/http.js";
 
 export interface SendEmailArgs {
   to: string[];

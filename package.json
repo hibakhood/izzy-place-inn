@@ -14,7 +14,7 @@
     "preview": "vite preview",
     "lint": "tsc -b --noEmit",
     "dev:client": "vite",
-    "test": "node --import tsx --test tests/*.test.ts",
+    "test": "node --import tsx --test tests/*.test.ts && node scripts/test-server-runtime.mjs",
     "postbuild": "node scripts/prerender.mjs"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { failure, HttpError } from './http';
+import { failure, HttpError } from './http.js';
 
 // Adapt the shared Web Request handler to Vercel's Node function interface.
 export function nodeHandler(handle: (request: Request) => Promise<Response>) {

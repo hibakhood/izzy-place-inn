@@ -1,4 +1,4 @@
-import { HttpError, text } from './http';
+import { HttpError, text } from './http.js';
 export async function verifyBotCheck(value: unknown, action: 'booking' | 'contact') {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) throw new HttpError(503,'Online requests are temporarily unavailable. Please call reception.');

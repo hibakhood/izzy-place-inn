@@ -1,6 +1,6 @@
-import { siteConfig } from "../src/lib/site";
-import { formatNaira, formatDate, formatDateShort } from "./format";
-import { escapeHtml } from "./server/html";
+import { siteConfig } from "../src/lib/site.js";
+import { formatNaira, formatDate, formatDateShort } from "./format.js";
+import { escapeHtml } from "./server/html.js";
 
 export interface EmailResource {
   name: string;

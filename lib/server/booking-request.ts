@@ -1,9 +1,9 @@
 import { createHmac } from 'node:crypto';
-import { roomRates } from '../../src/data/room-rates';
-import { addOnServices } from '../../src/data/addons';
-import { HttpError } from './http';
-import { validateBooking } from './validation';
-import type { EmailBooking } from '../email-templates';
+import { roomRates } from '../../src/data/room-rates.js';
+import { addOnServices } from '../../src/data/addons.js';
+import { HttpError } from './http.js';
+import { validateBooking } from './validation.js';
+import type { EmailBooking } from '../email-templates.js';
 
 export function buildBookingRequest(input: ReturnType<typeof validateBooking>): EmailBooking {
   const secret = process.env.BOOKING_REFERENCE_SECRET;

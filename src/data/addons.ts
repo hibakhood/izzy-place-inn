@@ -1,4 +1,4 @@
-import type { AddOnService } from "@/types";
+import type { AddOnService } from "../types.js";
 
 export const addOnServices: AddOnService[] = [
   { id: "addon-airport-transfer", name: "Airport Transfer", description: "Arrange a pickup or drop-off at Ibadan Airport.", price: null, category: "transport", icon: "Plane", available: true },

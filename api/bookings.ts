@@ -1,9 +1,9 @@
-import { nodeHandler } from "../lib/server/node-handler";
-import { requireEmailConfiguration } from '../lib/base44/integrations/core';
-import { failure, HttpError, jsonBody, rateLimit, response } from '../lib/server/http';
-import { validateBooking } from '../lib/server/validation';
-import { buildBookingRequest } from '../lib/server/booking-request';
-import { sendHotelBooking } from '../lib/server/notifications';
+import { nodeHandler } from "../lib/server/node-handler.js";
+import { requireEmailConfiguration } from '../lib/base44/integrations/core.js';
+import { failure, HttpError, jsonBody, rateLimit, response } from '../lib/server/http.js';
+import { validateBooking } from '../lib/server/validation.js';
+import { buildBookingRequest } from '../lib/server/booking-request.js';
+import { sendHotelBooking } from '../lib/server/notifications.js';
 export async function POST(req: Request): Promise<Response> {
   if (req.method !== 'POST') return response({error:'Method not allowed'},405);
   try {

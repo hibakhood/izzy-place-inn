@@ -1,10 +1,10 @@
-import { nodeHandler } from "../lib/server/node-handler";
-import { verifyBotCheck } from "../lib/server/bot-check";
+import { nodeHandler } from "../lib/server/node-handler.js";
+import { verifyBotCheck } from "../lib/server/bot-check.js";
 import { createHash } from "node:crypto";
-import { Core, requireEmailConfiguration } from "../lib/base44/integrations/core";
-import { email, failure, jsonBody, rateLimit, response, text, HttpError } from "../lib/server/http";
-import { escapeHtml } from "../lib/server/html";
-import { hotelRecipients } from "../lib/server/notifications";
+import { Core, requireEmailConfiguration } from "../lib/base44/integrations/core.js";
+import { email, failure, jsonBody, rateLimit, response, text, HttpError } from "../lib/server/http.js";
+import { escapeHtml } from "../lib/server/html.js";
+import { hotelRecipients } from "../lib/server/notifications.js";
 
 export async function POST(req: Request): Promise<Response> {
   if (req.method !== "POST") return response({ error: "Method not allowed" },405);
