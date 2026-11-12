@@ -19,9 +19,9 @@ export const hotelPhotos = {
     { src: asset("/images/rooms/deluxe-bathroom.jpg"), alt: "Deluxe Bathroom" },
   ],
   "executive-suite": [
+    { src: asset("/images/gallery/premium/24-executive-suite2.webp"), alt: "Executive Suite bedroom and seating area" },
     { src: asset("/images/gallery/premium/02-executive-suites.webp"), alt: "Executive Suite bedroom with a sitting area" },
     { src: asset("/images/gallery/premium/21-executive-suite-bedroom.webp"), alt: "Executive Suite bedroom with air conditioning" },
-    { src: asset("/images/gallery/premium/24-executive-suite2.webp"), alt: "Executive Suite bedroom and seating area" },
     { src: asset("/images/rooms/executive-suite-view-3.jpg"), alt: "Executive Suite view 3" },
     { src: asset("/images/rooms/executive-suite-view-2.jpg"), alt: "Executive suite view 2" },
     { src: asset("/images/rooms/executive-suite-view.jpg"), alt: "Executive suite view" },
@@ -31,9 +31,9 @@ export const hotelPhotos = {
     { src: asset("/images/rooms/executive-suite-toilet.jpg"), alt: "Executive Suite toilet" },
   ],
   "family-room": [
+    { src: asset("/images/gallery/premium/05-family-living-room.webp"), alt: "Family Room living room with a sofa and Smart TV" },
     { src: asset("/images/gallery/premium/03-family-bedroom.webp"), alt: "Family Room bedroom with white bedding" },
     { src: asset("/images/gallery/premium/04-family-kitchen.webp"), alt: "Family Room kitchen with a microwave and cooking area" },
-    { src: asset("/images/gallery/premium/05-family-living-room.webp"), alt: "Family Room living room with a sofa and Smart TV" },
     { src: asset("/images/gallery/premium/07-family-bedroom-1.webp"), alt: "Family Room bedroom with patterned bedding" },
     { src: asset("/images/gallery/premium/09-family-toilet-3.webp"), alt: "Family Room bathroom with a shower" },
     { src: asset("/images/gallery/premium/11-family-bedroom-2.webp"), alt: "Family Room bedroom beside the kitchen" },
