@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { validateBooking } from '../lib/server/validation';
 import { jsonBody, HttpError } from '../lib/server/http';
 import { buildAdminEmail, buildGuestEmail, type EmailBooking } from '../lib/email-templates';
-import { sendConfirmationPair, hotelRecipients } from '../lib/server/notifications';
+import { sendHotelBooking, hotelRecipients } from '../lib/server/notifications';
 import type { SendEmailArgs } from '../lib/base44/integrations/core';
 
 const key = 'f3172da5-3845-4f36-8c4a-d97f3fc94139';
@@ -33,37 +33,18 @@ test('both templates escape guest text and management rates remain unpriced', ()
   assert.ok(buildAdminEmail(booking).includes('&lt;a href=&quot;https://evil.example&quot;&gt;Click&lt;/a&gt;'));
 });
 
-test('hotel receives both configured addresses before the guest, with stable retry keys', async () => {
+test('only info inbox receives booking email, with a stable retry key', async () => {
   const calls: SendEmailArgs[] = [];
-  const events: string[] = [];
-  const sender = async (message: SendEmailArgs) => { calls.push(message); events.push(calls.length === 1 ? 'hotel' : 'guest'); return { id: 'provider-id' }; };
-  await sendConfirmationPair(booking, 'booking-1', false, sender, async () => { events.push('record-hotel'); });
-  assert.deepEqual(events, ['hotel', 'record-hotel', 'guest']);
-  assert.ok(calls[0].to.includes('izzyplaceinn@gmail.com'));
-  assert.ok(calls[0].to.includes('info@izzyplaceinn.com'));
-  assert.deepEqual(calls[1].to, ['ada@example.com']);
+  await sendHotelBooking(booking, 'booking-1', async message => { calls.push(message); return { id: 'provider-id' }; });
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0].to, ['info@izzyplaceinn.com']);
   assert.equal(calls[0].idempotencyKey, 'booking/booking-1/hotel');
-  assert.equal(calls[1].idempotencyKey, 'booking/booking-1/guest');
   assert.equal(calls[0].html, buildAdminEmail(booking));
-  assert.equal(new Set(hotelRecipients()).size, hotelRecipients().length);
+  assert.ok(calls[0].html.includes(booking.guest_email));
 });
 
-test('hotel failure prevents any guest confirmation', async () => {
-  let calls = 0; let marked = false;
-  await assert.rejects(sendConfirmationPair(booking, 'booking-2', false, async () => { calls++; throw new Error('provider unavailable'); }, async () => { marked = true; }));
-  assert.equal(calls, 1);
-  assert.equal(marked, false);
-});
-
-test('failed progress persistence prevents guest send; retry resumes after recorded hotel send', async () => {
-  const calls: SendEmailArgs[] = [];
-  const sender = async (message: SendEmailArgs) => { calls.push(message); return { id: 'provider-id' }; };
-  await assert.rejects(sendConfirmationPair(booking, 'booking-3', false, sender, async () => { throw new Error('database unavailable'); }));
-  assert.equal(calls.length, 1);
-  calls.length = 0;
-  await sendConfirmationPair(booking, 'booking-3', true, sender, async () => { assert.fail('must not repeat progress mark'); });
-  assert.equal(calls.length, 1);
-  assert.deepEqual(calls[0].to, [booking.guest_email]);
+test('hotel email failure prevents a successful booking response', async () => {
+  await assert.rejects(sendHotelBooking(booking, 'booking-2', async () => { throw new Error('provider unavailable'); }));
 });
 
 test('JSON reader rejects oversized, malformed and foreign-origin requests', async () => {
@@ -109,4 +90,21 @@ test('bot protection fails closed and rejects a valid token for another hostname
     globalThis.fetch=async()=>Response.json({success:true,hostname:'izzyplaceinn.com',action:'booking'});
     await verifyBotCheck('token','booking');
   } finally {globalThis.fetch=originalFetch; if(old===undefined)delete process.env.TURNSTILE_SECRET_KEY;else process.env.TURNSTILE_SECRET_KEY=old; if(origin===undefined)delete process.env.SITE_ORIGIN;else process.env.SITE_ORIGIN=origin;}
+});
+
+
+test('booking accepts no extras and each available optional extra', () => {
+  assert.deepEqual(validateBooking(input(), key).add_on_services, []);
+  for (const id of ['addon-airport-transfer', 'addon-welcome-drinks', 'addon-early-checkin', 'addon-late-checkout']) {
+    const selection = [{ id, quantity: 1 }];
+    assert.deepEqual(validateBooking({ ...input(), add_on_services: selection }, key).add_on_services, selection);
+  }
+});
+
+
+test('guest email remains required for hotel booking details', () => {
+  for (const guest_email of ['', undefined, 'invalid']) {
+    assert.throws(() => validateBooking({ ...input(), guest_email }, key), HttpError);
+  }
+  assert.equal(validateBooking(input(), key).guest_email, 'ada@example.com');
 });

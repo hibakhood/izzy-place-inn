@@ -153,8 +153,8 @@ export default function BookingConfirmationPrint({
 
       <div className="mt-10 border-t border-line pt-5 text-xs leading-relaxed text-ink">
         <p>
-          Your request has been received and held at {siteConfig.name}. Payment of{" "}
-          {formatNaira(totals.total)} is due by arrangement with our reservations team. For changes or
+          Your booking request has been received by {siteConfig.name}. Our team will confirm availability and arrange payment of{" "}
+          {formatNaira(totals.total)} with you. This is not a confirmed reservation or payment receipt. For changes or
           help, call {siteConfig.phones[0]} or email {siteConfig.emails.reservations}. Our reception is
           open 24 hours, every day.
         </p>

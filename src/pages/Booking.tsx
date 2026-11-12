@@ -1,3 +1,4 @@
+import { bookingConfirmationText } from "@/lib/booking-confirmation";
 import SecurityCheck from "@/components/SecurityCheck";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -93,7 +94,11 @@ export default function Booking() {
   }, [resource, checkIn, checkOut, numRooms, addOns]);
 
   const handleSubmit = async () => {
-    if (!resource || !checkIn || !checkOut || submitting || !botToken) return;
+    if (!resource || !checkIn || !checkOut || submitting) return;
+    if (!botToken) {
+      setError("Please complete the security check above the Send booking button. If it does not load, please call reception for help.");
+      return;
+    }
     setSubmitting(true);
     setError(null);
     const localDate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -138,6 +143,36 @@ export default function Booking() {
       setSubmitting(false);
       setBotToken("");
       setSecurityAttempt(n => n + 1);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (step !== 4 || !resource || !checkIn || !checkOut || confirmedTotal === null) return;
+    const localDate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const text = bookingConfirmationText({
+      room_category_id: resource.id,
+      guest_name: guestInfo.name.trim(), guest_email: guestInfo.email.trim(), guest_phone: guestInfo.phone.trim(),
+      check_in_date: localDate(checkIn), check_out_date: localDate(checkOut),
+      number_of_guests: guests, number_of_rooms: numRooms, add_on_services: [],
+      special_requests: guestInfo.requests.trim() || undefined,
+    }, bookingReference, resource.name, confirmedTotal,
+    Object.entries(addOns).filter(([, qty]) => qty > 0).map(([id, qty]) => `${getAddOnById(id)?.name ?? id} x ${qty}`),
+    `${siteConfig.phones[0]} | ${siteConfig.emails.reservations}`);
+    try {
+      const { jsPDF } = await import("jspdf");
+      const pdf = new jsPDF();
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(11);
+      const lines = pdf.splitTextToSize(text, 170) as string[];
+      let y = 22;
+      for (const line of lines) {
+        if (y > 275) { pdf.addPage(); y = 22; }
+        pdf.text(line, 20, y);
+        y += 6;
+      }
+      pdf.save(`${bookingReference}-booking-confirmation.pdf`);
+    } catch {
+      setError("We could not download your PDF. Please use Print / Save as PDF instead.");
     }
   };
 
@@ -188,7 +223,6 @@ export default function Booking() {
         ) : (
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
             <div>
-              {step === 3 && <SecurityCheck key={securityAttempt} action="booking" onVerify={setBotToken} />}
               <BookingWizard
                 rooms={rooms ?? []}
                 resource={resource}
@@ -209,11 +243,12 @@ export default function Booking() {
                 setAddOns={setAddOns}
                 totals={displayedTotals}
                 submitting={submitting}
-                securityReady={Boolean(botToken)}
+                securityCheck={<SecurityCheck key={securityAttempt} action="booking" onVerify={setBotToken} />}
                 error={error}
                 bookingReference={bookingReference}
                 onSubmit={handleSubmit}
                 onReset={handleReset}
+                onDownload={handleDownload}
               />
             </div>
 

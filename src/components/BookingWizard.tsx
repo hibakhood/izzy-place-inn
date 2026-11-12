@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
   CalendarDays,
@@ -13,6 +13,7 @@ import {
   Loader2,
   PartyPopper,
   Printer,
+  Download,
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -55,11 +56,12 @@ interface BookingWizardProps {
   setAddOns: (a: Record<string, number>) => void;
   totals: BookingTotals;
   submitting: boolean;
-  securityReady: boolean;
+  securityCheck: ReactNode;
   error: string | null;
   bookingReference: string;
   onSubmit: () => void;
   onReset: () => void;
+  onDownload: () => void;
 }
 
 const STEPS = [
@@ -154,7 +156,7 @@ export default function BookingWizard(props: BookingWizardProps) {
     step, setStep, checkIn, checkOut, setCheckIn, setCheckOut,
     guests, setGuests, numRooms, setNumRooms,
     guestInfo, setGuestInfo, addOns, setAddOns,
-    totals, submitting, securityReady, error, bookingReference, onSubmit, onReset,
+    totals, submitting, securityCheck, error, bookingReference, onSubmit, onReset, onDownload,
   } = props;
 
   const emailValid = useMemo(
@@ -176,7 +178,7 @@ export default function BookingWizard(props: BookingWizardProps) {
 
   return (
     <div>
-      {error && <p role="alert" className="mb-6 rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</p>}
+      {error && step !== 3 && <p role="alert" className="mb-6 rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</p>}
       {/* Room selection (step 0) */}
       <div className="mb-8">
         <p className="mb-3 text-sm font-medium text-ink">
@@ -317,9 +319,10 @@ export default function BookingWizard(props: BookingWizardProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="guest-email">Email address</Label>
+              <Label htmlFor="guest-email">Email address (required)</Label>
               <Input
                 id="guest-email"
+                required
                 type="email"
                 placeholder="you@example.com"
                 value={guestInfo.email}
@@ -366,9 +369,9 @@ export default function BookingWizard(props: BookingWizardProps) {
       {step === 3 && (
         <div className="space-y-6">
           <div>
-            <h3 className="font-display text-xl font-semibold text-ink">Add-on services</h3>
+            <h3 className="font-display text-xl font-semibold text-ink">Add-on services (optional)</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Rates vary and will be provided by a management representative. Add-on charges are not included in the room total.
+              You can send your booking without choosing any extras. Rates vary and will be provided by a management representative. Add-on charges are not included in the room total.
             </p>
           </div>
 
@@ -383,6 +386,9 @@ export default function BookingWizard(props: BookingWizardProps) {
             ))}
           </div>
 
+          {securityCheck}
+          {error && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</p>}
+
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Button variant="outline" onClick={() => setStep(2)}>
               <ArrowLeft className="mr-1 h-4 w-4" /> Back
@@ -390,7 +396,7 @@ export default function BookingWizard(props: BookingWizardProps) {
             <Button
               size="lg"
               onClick={onSubmit}
-              disabled={submitting || !securityReady}
+              disabled={submitting}
               className="min-w-0 w-full whitespace-normal px-4 sm:w-auto sm:min-w-44"
             >
               {submitting ? (
@@ -415,8 +421,7 @@ export default function BookingWizard(props: BookingWizardProps) {
           </div>
           <h3 className="mt-6 font-display text-2xl font-semibold text-ink">Request received</h3>
           <p className="mt-2 text-muted-foreground">
-            Your request has been sent to the hotel. We have emailed a copy to{" "}
-            <strong className="text-ink">{guestInfo.email}</strong>.
+            Your booking request has been sent to the hotel. You can print or download your confirmation below.
           </p>
 
           <div className="mt-6 rounded-md bg-cream-100 p-5">
@@ -442,15 +447,19 @@ export default function BookingWizard(props: BookingWizardProps) {
             Our reception will call you shortly to arrange payment and confirm availability. For urgent help, call us any hour.
           </p>
 
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button asChild variant="outline">
               <Link to="/">Back to Home</Link>
             </Button>
             <Button onClick={onReset}>Make Another Booking</Button>
             <Button onClick={() => window.print()}>
-              <Printer className="mr-1.5 h-4 w-4" /> Print Request
+              <Printer className="mr-1.5 h-4 w-4" /> Print / Save as PDF
+            </Button>
+            <Button variant="outline" onClick={onDownload}>
+              <Download className="mr-1.5 h-4 w-4" /> Download PDF
             </Button>
           </div>
+          <p className="mt-3 text-sm text-muted-foreground">Keep your confirmation and booking reference. Our team will contact you to confirm availability and arrange payment.</p>
         </div>
       )}
     </div>

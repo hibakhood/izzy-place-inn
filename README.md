@@ -22,9 +22,9 @@ Set independent long random `BOOKING_REFERENCE_SECRET` and `RATE_LIMIT_SECRET` v
 
 ## Booking behavior without a database
 
-The server calculates room estimates from the shared catalog. Hotel notification must be accepted by the email provider before the guest receipt is attempted. Guest emails clearly say **request received**, with availability and payment to be confirmed by hotel staff. There is no automatic inventory reservation, persisted guest record or background retry queue.
+The server calculates room estimates from the shared catalog. Booking notifications are sent only to **info@izzyplaceinn.com** and must be accepted by the email provider before the app shows success. Guest email remains required and is included in hotel booking details, but no booking email is sent to the guest. Guests can print their request confirmation or download a PDF; availability and payment must be confirmed by hotel staff. There is no automatic inventory reservation, persisted guest record or background retry queue.
 
-Unchanged retries use the same reference and provider idempotency keys. The browser keeps only a digest and random request key in session storage, not guest details. Provider duplicate protection lasts 24 hours; it is not permanent storage. If one email fails, the guest sees an error and can retry with unchanged details or call reception. Check provider delivery history before a manual resend. Email acceptance is not proof of inbox delivery. Test both hotel mailboxes and the guest mailbox with production credentials before launch.
+Unchanged retries use the same reference and provider idempotency keys. The browser keeps only a digest and random request key in session storage, not guest details. Provider duplicate protection lasts 24 hours; it is not permanent storage. If the hotel email fails, the guest sees an error and can retry with unchanged details or call reception. Check provider delivery history before a manual resend. Email acceptance is not proof of inbox delivery. Test the info@izzyplaceinn.com booking inbox with production credentials before launch.
 
 ## PWA installation and privacy
 
