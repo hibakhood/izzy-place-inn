@@ -49,6 +49,9 @@ export async function saveBooking(payload: BookingRequest, requestKey: string): 
       body: JSON.stringify(payload),
     });
     const data = await result.json().catch(() => null);
+    if (!data) {
+      return { ok: false, error: "The booking service is unavailable. Your booking has not been confirmed. Please call reception or try again later." };
+    }
     if (!result.ok) {
       return { ok: false, error: typeof data?.error === "string" ? data.error : "We could not confirm your booking. Please try again or call reception." };
     }

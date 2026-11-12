@@ -1,3 +1,4 @@
+import { nodeHandler } from "../lib/server/node-handler";
 import { verifyBotCheck } from "../lib/server/bot-check";
 import { createHash } from "node:crypto";
 import { Core, requireEmailConfiguration } from "../lib/base44/integrations/core";
@@ -24,3 +25,5 @@ export async function POST(req: Request): Promise<Response> {
     return response({ ok: true });
   } catch(error) { return failure(error); }
 }
+
+export default nodeHandler(POST);

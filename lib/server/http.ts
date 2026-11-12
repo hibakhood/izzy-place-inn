@@ -16,7 +16,9 @@ export async function jsonBody(req: Request): Promise<Record<string, unknown>> {
   const origin = req.headers.get("origin");
   const expected = process.env.SITE_ORIGIN || "https://izzyplaceinn.com";
   const local = process.env.NODE_ENV !== "production" && origin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
-  if (origin && origin !== expected && !local) throw new HttpError(403, "Request origin is not allowed.");
+  const hotelOrigins = new Set(["https://izzyplaceinn.com", "https://www.izzyplaceinn.com"]);
+  const canonicalAlias = hotelOrigins.has(expected) && origin !== null && hotelOrigins.has(origin);
+  if (origin && origin !== expected && !canonicalAlias && !local) throw new HttpError(403, "Request origin is not allowed.");
   if (Number(req.headers.get("content-length") || 0) > 16384) throw new HttpError(413, "Your request is too long.");
   const reader = req.body?.getReader();
   if (!reader) throw new HttpError(400, "Please complete the form.");

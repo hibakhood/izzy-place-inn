@@ -1,3 +1,4 @@
+import { nodeHandler } from "../lib/server/node-handler";
 import { requireEmailConfiguration } from '../lib/base44/integrations/core';
 import { failure, HttpError, jsonBody, rateLimit, response } from '../lib/server/http';
 import { validateBooking } from '../lib/server/validation';
@@ -16,3 +17,5 @@ export async function POST(req: Request): Promise<Response> {
     return response({ok:true,booking_reference:booking.booking_reference,total_amount:booking.total_amount,booking_status:'pending'});
   } catch(error) {return failure(error);}
 }
+
+export default nodeHandler(POST);
