@@ -140,3 +140,22 @@ test('booking succeeds without a security token and sends only the hotel email',
     keys.forEach((key, index) => { if (saved[index] === undefined) delete process.env[key]; else process.env[key] = saved[index]; });
   }
 });
+
+test('origin checks accept hotel aliases and exact deployment hosts without trusting arbitrary sites', async () => {
+  const names = ['SITE_ORIGIN', 'VERCEL', 'VERCEL_URL', 'VERCEL_BRANCH_URL', 'VERCEL_PROJECT_PRODUCTION_URL', 'NODE_ENV'];
+  const saved = names.map(name => process.env[name]);
+  const request = (origin: string) => new Request('https://www.izzyplaceinn.com/api/bookings', { method: 'POST', headers: { 'content-type': 'application/json', origin, host: 'attacker.example', 'x-forwarded-host': 'attacker.example' }, body: '{}' });
+  try {
+    Object.assign(process.env, { NODE_ENV: 'production', SITE_ORIGIN: ' https://www.izzyplaceinn.com/ ', VERCEL: '1', VERCEL_URL: 'izzy-test-deploy.vercel.app', VERCEL_BRANCH_URL: 'izzy-test-branch.vercel.app' });
+    for (const origin of ['https://izzyplaceinn.com', 'https://www.izzyplaceinn.com', 'https://izzy-test-deploy.vercel.app', 'https://izzy-test-branch.vercel.app']) {
+      assert.deepEqual(await jsonBody(request(origin)), {});
+    }
+    for (const origin of ['https://attacker.example', 'https://unrelated.vercel.app', 'https://www.izzyplaceinn.com.attacker.example', 'http://www.izzyplaceinn.com', 'null', 'http://localhost:5174']) {
+      await assert.rejects(jsonBody(request(origin)), { status: 403 });
+    }
+    process.env.SITE_ORIGIN = 'invalid';
+    assert.deepEqual(await jsonBody(request('https://www.izzyplaceinn.com')), {});
+  } finally {
+    names.forEach((name, index) => { if (saved[index] === undefined) delete process.env[name]; else process.env[name] = saved[index]; });
+  }
+});

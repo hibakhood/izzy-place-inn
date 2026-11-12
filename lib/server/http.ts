@@ -14,11 +14,25 @@ export function failure(error: unknown) {
 export async function jsonBody(req: Request): Promise<Record<string, unknown>> {
   if (!req.headers.get("content-type")?.includes("application/json")) throw new HttpError(415, "Please send a JSON request.");
   const origin = req.headers.get("origin");
-  const expected = process.env.SITE_ORIGIN || "https://izzyplaceinn.com";
+  const allowedOrigins = new Set(["https://izzyplaceinn.com", "https://www.izzyplaceinn.com"]);
+  // Trust only server configuration, never Host, forwarded headers, or a
+  // caller-supplied return URL. Normalize configured trailing slashes/paths.
+  const addConfiguredOrigin = (value: string | undefined) => {
+    if (!value?.trim()) return;
+    try {
+      const url = new URL(value.trim());
+      if (url.protocol === "https:" && !url.username && !url.password) allowedOrigins.add(url.origin);
+    } catch { /* Invalid configuration must not widen access. */ }
+  };
+  addConfiguredOrigin(process.env.SITE_ORIGIN);
+  if (process.env.VERCEL === "1") {
+    for (const name of ["VERCEL_URL", "VERCEL_BRANCH_URL", "VERCEL_PROJECT_PRODUCTION_URL"]) {
+      const hostname = process.env[name]?.trim();
+      if (hostname && /^[a-z0-9.-]+\.vercel\.app$/i.test(hostname)) addConfiguredOrigin(`https://${hostname}`);
+    }
+  }
   const local = process.env.NODE_ENV !== "production" && origin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
-  const hotelOrigins = new Set(["https://izzyplaceinn.com", "https://www.izzyplaceinn.com"]);
-  const canonicalAlias = hotelOrigins.has(expected) && origin !== null && hotelOrigins.has(origin);
-  if (origin && origin !== expected && !canonicalAlias && !local) throw new HttpError(403, "Request origin is not allowed.");
+  if (origin && !allowedOrigins.has(origin) && !local) throw new HttpError(403, "Request origin is not allowed.");
   if (Number(req.headers.get("content-length") || 0) > 16384) throw new HttpError(413, "Your request is too long.");
   const reader = req.body?.getReader();
   if (!reader) throw new HttpError(400, "Please complete the form.");
