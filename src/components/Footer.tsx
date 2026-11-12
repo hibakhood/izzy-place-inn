@@ -25,12 +25,12 @@ export default function Footer() {
             <h3 className="eyebrow text-ink">
               Explore
             </h3>
-            <ul className="mt-6 space-y-3 text-sm">
+            <ul className="mt-6 text-sm">
               {[...navLinks, { label: "Book Now", href: "/booking" }].map((link) => (
                 <li key={link.href}>
                   <Link
                     to={link.href}
-                    className="inline-flex min-h-11 items-center text-muted-foreground transition-colors hover:text-gold-deep"
+                    className="inline-flex min-h-11 items-center text-muted-foreground transition-colors hover:text-gold-deep lg:min-h-8"
                   >
                     {link.label}
                   </Link>
