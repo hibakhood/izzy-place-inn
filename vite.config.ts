@@ -31,10 +31,27 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true,
-        navigateFallback: "index.html",
-        navigateFallbackDenylist: [/^\/api\//],
+        navigateFallback: null,
         maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
         runtimeCaching: [
+          {
+            urlPattern: ({ request, url }) => request.mode === "navigate" && /(?:^|\/)booking\/?$/.test(url.pathname),
+            handler: "NetworkOnly",
+            options: {
+              precacheFallback: { fallbackURL: process.env.VERCEL ? "/index.html" : "/izzy-place-inn/index.html" },
+            },
+          },
+          {
+            urlPattern: ({ request, url }) => request.mode === "navigate" && !url.pathname.startsWith("/api/") && !/(?:^|\/)booking\/?$/.test(url.pathname),
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "izzy-public-pages-v2",
+              networkTimeoutSeconds: 8,
+              cacheableResponse: { statuses: [200] },
+              expiration: { maxEntries: 20, maxAgeSeconds: 86400 },
+              precacheFallback: { fallbackURL: process.env.VERCEL ? "/index.html" : "/izzy-place-inn/index.html" },
+            },
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "StaleWhileRevalidate",

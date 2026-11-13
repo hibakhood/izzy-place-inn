@@ -34,3 +34,8 @@ Automated tests cover server ESM execution, hotel-only delivery, required guest 
 - Contact submission still requires valid Turnstile configuration. No live CAPTCHA was completed during this audit.
 - An installed app already running an old bundle needs to close/reopen or refresh once. New update behavior only runs after that updated bundle loads.
 - No physical phone, hosting-account logs, mailbox access, historical forensics or penetration test was available. This review cannot certify absence of every vulnerability or breach.
+
+
+## Android follow-up
+
+The user confirmed the booking flow works in Chrome Incognito but fails in normal Chrome and the installed app. This isolates the remaining failure to stored site state/cached application code rather than general Android incompatibility. Public navigations now use a network-first strategy; booking navigation uses network-only with a generic offline shell fallback. Booking URLs and details are not saved in the runtime page cache. The obsolete precache-only navigation handler has been removed. Existing installations may require a one-time site-specific storage reset to discard already-installed old workers. Origin rejection now includes a sanitized origin-only diagnostic (no path, query or guest data), and the booking page offers a canonical recovery link.

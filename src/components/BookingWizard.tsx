@@ -386,6 +386,7 @@ export default function BookingWizard(props: BookingWizardProps) {
           </div>
 
           {error && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</p>}
+          {error?.includes("origin is not allowed") && <a className="inline-block text-sm font-semibold text-gold-deep underline" href="https://www.izzyplaceinn.com/booking?refresh=2">Open the secure booking page</a>}
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Button variant="outline" onClick={() => setStep(2)}>

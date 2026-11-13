@@ -179,3 +179,16 @@ test('booking CORS permits only trusted origins and required request headers', a
   assert.equal(invalidBooking.status, 400);
   assert.equal(invalidBooking.headers.get('access-control-allow-origin'), 'https://izzyplaceinn.com');
 });
+
+test('origin diagnostic includes only the public origin, never a path or query', async () => {
+  const request = new Request('https://www.izzyplaceinn.com/api/bookings', { method: 'POST', headers: { 'content-type': 'application/json', origin: 'https://attacker.example/private?secret=hidden' }, body: '{}' });
+  await assert.rejects(jsonBody(request), (error: unknown) => {
+    assert.ok(error instanceof HttpError);
+    assert.equal(error.status, 403);
+    assert.ok(error.message.includes('ORIGIN-02'));
+    assert.ok(error.message.includes('https://attacker.example'));
+    assert.ok(!error.message.includes('hidden'));
+    assert.ok(!error.message.includes('/private'));
+    return true;
+  });
+});

@@ -35,7 +35,11 @@ export function isAllowedOrigin(origin: string | null): boolean {
 export async function jsonBody(req: Request): Promise<Record<string, unknown>> {
   if (!req.headers.get("content-type")?.includes("application/json")) throw new HttpError(415, "Please send a JSON request.");
   const origin = req.headers.get("origin");
-  if (origin && !isAllowedOrigin(origin)) throw new HttpError(403, "Request origin is not allowed.");
+  if (origin && !isAllowedOrigin(origin)) {
+    let source = "unrecognized";
+    try { source = new URL(origin).origin; } catch { /* Opaque origins remain blocked. */ }
+    throw new HttpError(403, `Request origin is not allowed. Source: ${source}. Code: ORIGIN-02. Please open https://www.izzyplaceinn.com/booking in Chrome.`);
+  }
   if (Number(req.headers.get("content-length") || 0) > 16384) throw new HttpError(413, "Your request is too long.");
   const reader = req.body?.getReader();
   if (!reader) throw new HttpError(400, "Please complete the form.");
