@@ -1,3 +1,4 @@
+import { createRequestKey, isRequestKey } from "@/lib/request-key";
 import { bookingConfirmationText } from "@/lib/booking-confirmation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -110,14 +111,14 @@ export default function Booking() {
     try {
       const fingerprint = JSON.stringify(payload);
       if (requestAttempt.current?.fingerprint !== fingerprint) {
-        let key = crypto.randomUUID();
+        let key = createRequestKey();
         // Persist only a digest and random key, never guest details. This also
         // protects an unchanged request retried after a page refresh.
         try {
           const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(fingerprint));
           const hash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
           const previous = JSON.parse(sessionStorage.getItem("izzy-booking-attempt") || "null");
-          if (previous?.hash === hash && typeof previous.key === "string") key = previous.key;
+          if (previous?.hash === hash && isRequestKey(previous.key)) key = previous.key;
           sessionStorage.setItem("izzy-booking-attempt", JSON.stringify({ hash, key }));
         } catch { /* Private browsing may disable storage; same-page retries remain protected. */ }
         requestAttempt.current = { fingerprint, key };
