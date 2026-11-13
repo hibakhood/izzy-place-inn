@@ -1,3 +1,4 @@
+import { bookingEndpoint } from "./canonical-app-url";
 export interface EmailAddOnPayload {
   name: string;
   price: number | null;
@@ -42,8 +43,13 @@ export type BookingResult =
   | { ok: false; error: string };
 
 export async function saveBooking(payload: BookingRequest, requestKey: string): Promise<BookingResult> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 25000);
   try {
-    const result = await fetch("/api/bookings", {
+    const result = await fetch(bookingEndpoint(window.location.origin), {
+      signal: controller.signal,
+      credentials: "omit",
+      redirect: "error",
       method: "POST",
       headers: { "Content-Type": "application/json", "Idempotency-Key": requestKey },
       body: JSON.stringify(payload),
@@ -61,5 +67,7 @@ export async function saveBooking(payload: BookingRequest, requestKey: string): 
     return { ok: true, booking_reference: data.booking_reference, total_amount: data.total_amount };
   } catch {
     return { ok: false, error: "We could not reach reception. Please retry with the same details to check your booking, or call us." };
+  } finally {
+    clearTimeout(timer);
   }
 }

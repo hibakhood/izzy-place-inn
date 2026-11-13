@@ -29,6 +29,8 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,woff2}"],
         globIgnores: ["**/images/**", "**/videos/**"],
         cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         navigateFallback: "index.html",
         navigateFallbackDenylist: [/^\/api\//],
         maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,

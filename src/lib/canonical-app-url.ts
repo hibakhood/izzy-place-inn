@@ -6,3 +6,7 @@ export function canonicalAppUrl(href: string): string | null {
   url.hostname = 'www.izzyplaceinn.com';
   return url.href;
 }
+
+export function bookingEndpoint(origin: string): string {
+  return origin === 'https://izzyplaceinn.com' ? 'https://www.izzyplaceinn.com/api/bookings' : '/api/bookings';
+}

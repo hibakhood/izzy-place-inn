@@ -302,7 +302,7 @@ export default function BookingWizard(props: BookingWizardProps) {
           <div>
             <h3 className="font-display text-xl font-semibold text-ink">Your details</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              We will send your booking confirmation to this email.
+              The hotel will use these details to contact you about your booking.
             </p>
           </div>
 

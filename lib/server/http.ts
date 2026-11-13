@@ -11,9 +11,7 @@ export function failure(error: unknown) {
   const status = error instanceof HttpError ? error.status : 503;
   return response({ ok: false, error: error instanceof HttpError ? error.message : "We could not complete your request. Please try again or call reception." }, status);
 }
-export async function jsonBody(req: Request): Promise<Record<string, unknown>> {
-  if (!req.headers.get("content-type")?.includes("application/json")) throw new HttpError(415, "Please send a JSON request.");
-  const origin = req.headers.get("origin");
+export function isAllowedOrigin(origin: string | null): boolean {
   const allowedOrigins = new Set(["https://izzyplaceinn.com", "https://www.izzyplaceinn.com"]);
   // Trust only server configuration, never Host, forwarded headers, or a
   // caller-supplied return URL. Normalize configured trailing slashes/paths.
@@ -32,7 +30,12 @@ export async function jsonBody(req: Request): Promise<Record<string, unknown>> {
     }
   }
   const local = process.env.NODE_ENV !== "production" && origin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
-  if (origin && !allowedOrigins.has(origin) && !local) throw new HttpError(403, "Request origin is not allowed.");
+  return Boolean(origin && (allowedOrigins.has(origin) || local));
+}
+export async function jsonBody(req: Request): Promise<Record<string, unknown>> {
+  if (!req.headers.get("content-type")?.includes("application/json")) throw new HttpError(415, "Please send a JSON request.");
+  const origin = req.headers.get("origin");
+  if (origin && !isAllowedOrigin(origin)) throw new HttpError(403, "Request origin is not allowed.");
   if (Number(req.headers.get("content-length") || 0) > 16384) throw new HttpError(413, "Your request is too long.");
   const reader = req.body?.getReader();
   if (!reader) throw new HttpError(400, "Please complete the form.");

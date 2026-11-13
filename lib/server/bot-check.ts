@@ -1,4 +1,4 @@
-import { HttpError, text } from './http.js';
+import { HttpError, text, isAllowedOrigin } from './http.js';
 export async function verifyBotCheck(value: unknown, action: 'booking' | 'contact') {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) throw new HttpError(503,'Online requests are temporarily unavailable. Please call reception.');
@@ -8,6 +8,6 @@ export async function verifyBotCheck(value: unknown, action: 'booking' | 'contac
   });
   if (!result.ok) throw new HttpError(503,'The security check is unavailable. Please try again.');
   const data = await result.json() as {success?:boolean;hostname?:string;action?:string};
-  const hostname = new URL(process.env.SITE_ORIGIN || 'https://izzyplaceinn.com').hostname;
-  if (!data.success || data.hostname !== hostname || data.action !== action) throw new HttpError(400,'Please complete a new security check and try again.');
+  const trustedHostname = typeof data.hostname === 'string' && /^[a-z0-9.-]+$/i.test(data.hostname) && isAllowedOrigin(`https://${data.hostname}`);
+  if (!data.success || !trustedHostname || data.action !== action) throw new HttpError(400,'Please complete a new security check and try again.');
 }

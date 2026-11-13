@@ -89,6 +89,8 @@ test('bot protection fails closed and rejects a valid token for another hostname
     }
     globalThis.fetch=async()=>Response.json({success:true,hostname:'izzyplaceinn.com',action:'booking'});
     await verifyBotCheck('token','booking');
+    globalThis.fetch=async()=>Response.json({success:true,hostname:'www.izzyplaceinn.com',action:'contact'});
+    await verifyBotCheck('token','contact');
   } finally {globalThis.fetch=originalFetch; if(old===undefined)delete process.env.TURNSTILE_SECRET_KEY;else process.env.TURNSTILE_SECRET_KEY=old; if(origin===undefined)delete process.env.SITE_ORIGIN;else process.env.SITE_ORIGIN=origin;}
 });
 
@@ -158,4 +160,22 @@ test('origin checks accept hotel aliases and exact deployment hosts without trus
   } finally {
     names.forEach((name, index) => { if (saved[index] === undefined) delete process.env[name]; else process.env[name] = saved[index]; });
   }
+});
+
+test('booking CORS permits only trusted origins and required request headers', async () => {
+  const { OPTIONS, POST } = await import('../api/bookings');
+  const preflight = (origin: string, headers = 'content-type,idempotency-key') => new Request('https://www.izzyplaceinn.com/api/bookings', { method: 'OPTIONS', headers: { origin, 'access-control-request-method': 'POST', 'access-control-request-headers': headers } });
+  const accepted = await OPTIONS(preflight('https://izzyplaceinn.com'));
+  assert.equal(accepted.status, 204);
+  assert.equal(accepted.headers.get('access-control-allow-origin'), 'https://izzyplaceinn.com');
+  assert.equal(accepted.headers.get('access-control-allow-credentials'), null);
+  for (const origin of ['null', 'https://attacker.example', 'https://izzyplaceinn.com.attacker.example']) {
+    const rejected = await OPTIONS(preflight(origin));
+    assert.equal(rejected.status, 403);
+    assert.equal(rejected.headers.get('access-control-allow-origin'), null);
+  }
+  assert.equal((await OPTIONS(preflight('https://izzyplaceinn.com', 'authorization'))).status, 403);
+  const invalidBooking = await POST(new Request('https://www.izzyplaceinn.com/api/bookings', { method: 'POST', headers: { origin: 'https://izzyplaceinn.com', 'content-type': 'application/json' }, body: '{}' }));
+  assert.equal(invalidBooking.status, 400);
+  assert.equal(invalidBooking.headers.get('access-control-allow-origin'), 'https://izzyplaceinn.com');
 });

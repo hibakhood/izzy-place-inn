@@ -1,10 +1,10 @@
 import { nodeHandler } from "../lib/server/node-handler.js";
 import { requireEmailConfiguration } from '../lib/base44/integrations/core.js';
-import { failure, HttpError, jsonBody, rateLimit, response } from '../lib/server/http.js';
+import { failure, HttpError, jsonBody, rateLimit, response, isAllowedOrigin } from '../lib/server/http.js';
 import { validateBooking } from '../lib/server/validation.js';
 import { buildBookingRequest } from '../lib/server/booking-request.js';
 import { sendHotelBooking } from '../lib/server/notifications.js';
-export async function POST(req: Request): Promise<Response> {
+async function submitBooking(req: Request): Promise<Response> {
   if (req.method !== 'POST') return response({error:'Method not allowed'},405);
   try {
     const body = await jsonBody(req);
@@ -18,4 +18,28 @@ export async function POST(req: Request): Promise<Response> {
   } catch(error) {return failure(error);}
 }
 
-export default nodeHandler(POST);
+function corsResponse(req: Request, result: Response): Response {
+  const origin = req.headers.get("origin");
+  if (isAllowedOrigin(origin)) {
+    result.headers.set("Access-Control-Allow-Origin", origin!);
+    result.headers.set("Vary", "Origin");
+  }
+  return result;
+}
+
+export async function POST(req: Request): Promise<Response> {
+  return corsResponse(req, await submitBooking(req));
+}
+
+export async function OPTIONS(req: Request): Promise<Response> {
+  const headers = (req.headers.get("access-control-request-headers") || "").toLowerCase().split(",").map(h => h.trim()).filter(Boolean);
+  if (!isAllowedOrigin(req.headers.get("origin")) || req.headers.get("access-control-request-method") !== "POST" || headers.some(h => !["content-type", "idempotency-key"].includes(h))) {
+    return response({ ok: false, error: "Request origin is not allowed." }, 403);
+  }
+  const result = corsResponse(req, new Response(null, { status: 204, headers: { "Cache-Control": "no-store" } }));
+  result.headers.set("Access-Control-Allow-Methods", "POST");
+  result.headers.set("Access-Control-Allow-Headers", "Content-Type, Idempotency-Key");
+  return result;
+}
+
+export default nodeHandler(req => req.method === "OPTIONS" ? OPTIONS(req) : POST(req));

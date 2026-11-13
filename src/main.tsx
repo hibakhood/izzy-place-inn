@@ -1,5 +1,6 @@
 import { canonicalAppUrl } from "./lib/canonical-app-url";
 import "./lib/pwa-install";
+import "./lib/pwa-update";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
