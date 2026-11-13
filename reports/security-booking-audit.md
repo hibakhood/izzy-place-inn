@@ -39,3 +39,7 @@ Automated tests cover server ESM execution, hotel-only delivery, required guest 
 ## Android follow-up
 
 The user confirmed the booking flow works in Chrome Incognito but fails in normal Chrome and the installed app. This isolates the remaining failure to stored site state/cached application code rather than general Android incompatibility. Public navigations now use a network-first strategy; booking navigation uses network-only with a generic offline shell fallback. Booking URLs and details are not saved in the runtime page cache. The obsolete precache-only navigation handler has been removed. Existing installations may require a one-time site-specific storage reset to discard already-installed old workers. Origin rejection now includes a sanitized origin-only diagnostic (no path, query or guest data), and the booking page offers a canonical recovery link.
+
+## Installed Vercel alias correction
+
+A subsequent Android screenshot identified the actual rejected origin as https://izzy-place-inn.vercel.app. Earlier cache-only diagnosis was incomplete: this stable project alias was absent from the allowlist even though generated Vercel deployment hosts were trusted. Public checks confirmed the alias and the canonical domain serve the same current application entry bundle. The exact alias is now explicitly allowed, with regression tests rejecting lookalike domains, HTTP and unrelated Vercel apps. No wildcard Vercel trust was introduced.

@@ -12,7 +12,7 @@ export function failure(error: unknown) {
   return response({ ok: false, error: error instanceof HttpError ? error.message : "We could not complete your request. Please try again or call reception." }, status);
 }
 export function isAllowedOrigin(origin: string | null): boolean {
-  const allowedOrigins = new Set(["https://izzyplaceinn.com", "https://www.izzyplaceinn.com"]);
+  const allowedOrigins = new Set(["https://izzyplaceinn.com", "https://www.izzyplaceinn.com", "https://izzy-place-inn.vercel.app"]);
   // Trust only server configuration, never Host, forwarded headers, or a
   // caller-supplied return URL. Normalize configured trailing slashes/paths.
   const addConfiguredOrigin = (value: string | undefined) => {

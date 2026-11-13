@@ -149,7 +149,7 @@ test('origin checks accept hotel aliases and exact deployment hosts without trus
   const request = (origin: string) => new Request('https://www.izzyplaceinn.com/api/bookings', { method: 'POST', headers: { 'content-type': 'application/json', origin, host: 'attacker.example', 'x-forwarded-host': 'attacker.example' }, body: '{}' });
   try {
     Object.assign(process.env, { NODE_ENV: 'production', SITE_ORIGIN: ' https://www.izzyplaceinn.com/ ', VERCEL: '1', VERCEL_URL: 'izzy-test-deploy.vercel.app', VERCEL_BRANCH_URL: 'izzy-test-branch.vercel.app' });
-    for (const origin of ['https://izzyplaceinn.com', 'https://www.izzyplaceinn.com', 'https://izzy-test-deploy.vercel.app', 'https://izzy-test-branch.vercel.app']) {
+    for (const origin of ['https://izzyplaceinn.com', 'https://www.izzyplaceinn.com', 'https://izzy-place-inn.vercel.app', 'https://izzy-test-deploy.vercel.app', 'https://izzy-test-branch.vercel.app']) {
       assert.deepEqual(await jsonBody(request(origin)), {});
     }
     for (const origin of ['https://attacker.example', 'https://unrelated.vercel.app', 'https://www.izzyplaceinn.com.attacker.example', 'http://www.izzyplaceinn.com', 'null', 'http://localhost:5174']) {
@@ -191,4 +191,15 @@ test('origin diagnostic includes only the public origin, never a path or query',
     assert.ok(!error.message.includes('/private'));
     return true;
   });
+});
+
+
+test('installed hotel Vercel alias is trusted without allowing other Vercel apps', async () => {
+  const { isAllowedOrigin } = await import('../lib/server/http');
+  assert.equal(isAllowedOrigin('https://izzy-place-inn.vercel.app'), true);
+  for (const origin of ['https://unrelated.vercel.app', 'https://izzy-place-inn.vercel.app.attacker.example', 'https://izzy-place-inn-attacker.vercel.app', 'http://izzy-place-inn.vercel.app', 'null']) assert.equal(isAllowedOrigin(origin), false);
+  const { OPTIONS } = await import('../api/bookings');
+  const response = await OPTIONS(new Request('https://izzy-place-inn.vercel.app/api/bookings', { method: 'OPTIONS', headers: { origin: 'https://izzy-place-inn.vercel.app', 'access-control-request-method': 'POST', 'access-control-request-headers': 'content-type,idempotency-key' } }));
+  assert.equal(response.status, 204);
+  assert.equal(response.headers.get('access-control-allow-origin'), 'https://izzy-place-inn.vercel.app');
 });
